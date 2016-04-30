@@ -1,7 +1,7 @@
 import numpy as np
 import sys
 from sklearn import preprocessing
-
+from Board import BoardImplementation as Board
 
 def get_random_move(board):
     xs, ys = board.get_moves()
@@ -52,36 +52,31 @@ def minimax(board, player, max_depth, current_depth):
 def learn_probability(board):
     winX = np.zeros((3, 3))
     winO = np.zeros((3, 3))
-
     for i in range(1000):
-        print i
-        board.board = np.zeros((3,3))
+        board = Board(3)
         countX = np.zeros((3, 3))
         countO = np.zeros((3, 3))
         while board.move_still_possible():
             move = get_random_move(board)
             x, y = move
-            print board.player
-            print move
+
             if (board.player == 1):
                 countX[x,y] += 1
             else:
                 countO[x,y] += 1
             board.make_move(move)
-        winner = board.player
-        if winner == 1:
-            winX += countX
-        elif winner == -1:
-            winO += countO
-        else:
-            return
-    print winX
-    print winO
+
+            winner = 0
+            if(board.move_was_winning_move(board.player)):
+                winner = board.player
+                if winner == 1:
+                    winX += countX
+                elif winner == -1:
+                    winO += countO
+                break
 
     win = winX + winO
-    print win
     win_normalized = preprocessing.normalize(win, norm='l2')
-    print win_normalized
-
-    f = open('myfile', 'w')
+    f = open('probabilities', 'w')
     np.savetxt(f, win_normalized)
+

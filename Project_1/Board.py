@@ -75,8 +75,8 @@ class BoardImplementation:
 
     def make_move(self, (x, y)):
         self.board[x, y] = self.player
-
         self.move_was_winning_move(self.player)
+
 
         if not self.is_over:
             self.player *= -1
