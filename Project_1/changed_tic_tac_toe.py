@@ -1,16 +1,14 @@
-import numpy as np
-from sklearn import preprocessing
-from Board import BoardImplementation as Board
 import agent
+from Board import BoardImplementation as Board
 
 
 def one_agent_makes_move(board):
     if board.player == 1:  # X-player
-        move = agent.get_random_move(board)
-        # move = agent.get_minimax_move(board, 2)
-    else: # O-player
-        move = agent.get_random_move(board)
-        # move = agent.get_minimax_move(board, max_depth=5)
+        # move = agent.get_random_move(board)
+        move = agent.get_minimax_move(board, 2)
+    else:  # O-player
+        # move = agent.get_random_move(board)
+        move = agent.get_minimax_move(board, max_depth=2)
     board.make_move(move)
 
 
@@ -20,7 +18,6 @@ def play():
 
     # initialize  move counter
     mvcntr = 1
-
 
     while board.move_still_possible():
 
@@ -35,6 +32,6 @@ def play():
     return 0, mvcntr
     # print 'game ended in a draw'
 
+
 board = Board(3)
 agent.learn_probability(board)
-

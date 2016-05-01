@@ -1,7 +1,9 @@
 import numpy as np
 import sys
 from sklearn import preprocessing
+
 from Board import BoardImplementation as Board
+
 
 def get_random_move(board):
     xs, ys = board.get_moves()
@@ -60,14 +62,14 @@ def learn_probability(board):
             move = get_random_move(board)
             x, y = move
 
-            if (board.player == 1):
-                countX[x,y] += 1
+            if board.player == 1:
+                countX[x, y] += 1
             else:
-                countO[x,y] += 1
+                countO[x, y] += 1
             board.make_move(move)
 
             winner = 0
-            if(board.move_was_winning_move(board.player)):
+            if board.move_was_winning_move(board.player):
                 winner = board.player
                 if winner == 1:
                     winX += countX
@@ -79,4 +81,3 @@ def learn_probability(board):
     win_normalized = preprocessing.normalize(win, norm='l2')
     f = open('probabilities', 'w')
     np.savetxt(f, win_normalized)
-
