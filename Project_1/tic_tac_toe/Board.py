@@ -6,12 +6,12 @@ class BoardImplementation:
     def __init__(self, size):
         self.is_over = False
         self.player = 1
-        self.board = np.zeros((size, size), dtype=int)
+        self.state = np.zeros((size, size), dtype=int)
         self.coefficients = [3, 1, -3, -1]
 
     def get_moves(self):
         """ :return  x and y positions of empty cells """
-        return np.where(self.board == 0)
+        return np.where(self.state == 0)
 
     def evaluate(self, player):
         """"
@@ -24,8 +24,6 @@ class BoardImplementation:
         O1 = number of lines with 1 O and 2 blanks
         Return Infinity if X wins and -Infinity if O wins
 
-        Russell & Norvig
-        Games, evaluation functions
         :return
             one value, positive for advantage to one player, negative
             means advantage to the other. Zero indicates it is even.
@@ -54,27 +52,27 @@ class BoardImplementation:
 
         # checking rows and columns
         for ax in range(0, 2):
-            prods = np.product(self.board, axis=ax)
-            sums = np.sum(self.board, axis=ax)
+            prods = np.product(self.state, axis=ax)
+            sums = np.sum(self.state, axis=ax)
             check(prods, sums)
 
         # checking main diagonal
-        main_diag = np.diag(self.board)
+        main_diag = np.diag(self.state)
         check(np.array([main_diag.prod()]), np.array([main_diag.sum()]))
 
         # checking other diagonal
-        nonmain_diag = np.diag(np.rot90(self.board))
+        nonmain_diag = np.diag(np.rot90(self.state))
         check(np.array([nonmain_diag.prod()]), np.array([nonmain_diag.sum()]))
 
         return winner[0] if winner[0] != 0 else np.sum(np.multiply(values, self.coefficients))
 
     def move_still_possible(self):
         """"Checks if there is an empty cell on the board"""
-        self.is_over = (self.board[self.board == 0].size == 0)
+        self.is_over = (self.state[self.state == 0].size == 0)
         return not self.is_over
 
     def make_move(self, (x, y)):
-        self.board[x, y] = self.player
+        self.state[x, y] = self.player
         self.move_was_winning_move(self.player)
         if not self.is_over:
             self.player *= -1
@@ -85,19 +83,19 @@ class BoardImplementation:
 
     # print game state matrix using symbols
     def print_game_state(self):
-        b = np.copy(self.board).astype(object)
+        b = np.copy(self.state).astype(object)
         for n in [-1, 0, 1]:
             b[b == n] = self.symbols[n]
         print b
 
     def move_was_winning_move(self, player):
-        if np.max((np.sum(self.board, axis=0)) * player) == 3:
+        if np.max((np.sum(self.state, axis=0)) * player) == 3:
             self.is_over = True
-        elif np.max((np.sum(self.board, axis=1)) * player) == 3:
+        elif np.max((np.sum(self.state, axis=1)) * player) == 3:
             self.is_over = True
-        elif (np.sum(np.diag(self.board)) * player) == 3:
+        elif (np.sum(np.diag(self.state)) * player) == 3:
             self.is_over = True
-        elif (np.sum(np.diag(np.rot90(self.board))) * player) == 3:
+        elif (np.sum(np.diag(np.rot90(self.state))) * player) == 3:
             self.is_over = True
         else:
             self.is_over = False
@@ -105,7 +103,7 @@ class BoardImplementation:
 
     def copy(self):
         new_board = BoardImplementation(0)
-        new_board.board = self.board.copy()
+        new_board.state = self.state.copy()
         new_board.player = self.player
         new_board.is_over = self.is_over
         return new_board

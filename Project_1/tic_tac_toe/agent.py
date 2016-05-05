@@ -11,13 +11,13 @@ def get_random_move(board):
     return xs[i], ys[i]
 
 
-def get_minimax_move(board, max_depth=2):
+def get_minmax_move(board, max_depth=2):
     # Get the result of a minimax run and return the move
-    score, move = minimax(board, board.player, max_depth, 0)
+    score, move = minmax(board, board.player, max_depth, 0)
     return move
 
 
-def minimax(board, player, max_depth, current_depth):
+def minmax(board, player, max_depth, current_depth):
     # Check if we're done recursing
     if board.game_is_over() or current_depth == max_depth:
         return board.evaluate(player), (None, None)
@@ -35,7 +35,7 @@ def minimax(board, player, max_depth, current_depth):
         new_board.make_move((moves_x[i], moves_y[i]))
 
         # Recurse
-        current_score, current_move = minimax(new_board, player, max_depth, current_depth + 1)
+        current_score, current_move = minmax(new_board, player, max_depth, current_depth + 1)
 
         # Update the best score
         if board.current_player() == player:
@@ -51,10 +51,10 @@ def minimax(board, player, max_depth, current_depth):
     return best_score, best_move
 
 
-def learn_probability(board):
+def learn_probabilities():
     winX = np.zeros((3, 3))
     winO = np.zeros((3, 3))
-    for i in range(1000):
+    for i in range(5000):
         board = Board(3)
         countX = np.zeros((3, 3))
         countO = np.zeros((3, 3))
@@ -68,7 +68,6 @@ def learn_probability(board):
                 countO[x, y] += 1
             board.make_move(move)
 
-            winner = 0
             if board.move_was_winning_move(board.player):
                 winner = board.player
                 if winner == 1:
@@ -81,3 +80,20 @@ def learn_probability(board):
     win_normalized = preprocessing.normalize(win, norm='l2')
     f = open('probabilities', 'w')
     np.savetxt(f, win_normalized)
+    print "Learning finished!"
+    return win_normalized
+
+
+def get_probabilistic_move(board):
+    try:
+        prob_matrix = np.loadtxt("probabilities")
+    except IOError:
+        prob_matrix = learn_probabilities()
+
+    prob = np.zeros((3, 3))
+    for i in range(3):
+        for j in range(3):
+            if board.state[i, j] == 0:
+                prob[i, j] = prob_matrix[i, j]
+    x, y = np.where(prob == prob.max())
+    return x[0], y[0]
