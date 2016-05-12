@@ -14,7 +14,7 @@ BOARDHEIGHT = 6  # how many spaces tall the board is
 assert BOARDWIDTH >= 4 and BOARDHEIGHT >= 4, 'Board must be at least 4x4.'
 
 DIFFICULTY = 2  # how many moves to look ahead. (>2 is usually too much)
-
+INIT_SPEED = 6
 SPACESIZE = 50  # size of the tokens and individual board spaces in pixels
 
 FPS = 30  # frames per second to update the screen
@@ -121,6 +121,7 @@ def makeMove(board, player, column):
     lowest = getLowestEmptySpace(board, column)
     if lowest != -1:
         board[column][lowest] = player
+    return board
 
 
 def drawBoard(board, extraToken=None):
@@ -164,7 +165,7 @@ def getNewBoard():
 def animateDroppingToken(board, column, color):
     x = XMARGIN + column * SPACESIZE
     y = YMARGIN - SPACESIZE
-    dropSpeed = 1.5
+    dropSpeed = INIT_SPEED
 
     lowestEmptySpace = getLowestEmptySpace(board, column)
 
@@ -187,7 +188,7 @@ def animateComputerMoving(board, column, player):
         color = RED
         x = REDPILERECT.left
         y = REDPILERECT.top
-    speed = 1.5
+    speed = INIT_SPEED
     # moving the black tile up
     while y > (YMARGIN - SPACESIZE):
         y -= int(speed)
@@ -197,7 +198,7 @@ def animateComputerMoving(board, column, player):
         FPSCLOCK.tick()
     # moving the black tile over
     y = YMARGIN - SPACESIZE
-    speed = 1.5
+    speed = INIT_SPEED
     while x * player < player * (XMARGIN + column * SPACESIZE):
         x += player * int(speed)
         # speed += 0.5
@@ -315,6 +316,66 @@ def isWinner(board, tile):
     return False
 
 
+def wasWinningMove(board, tile, pos_x):
+    pos_y = getLowestEmptySpace(board, pos_x)
+    pos_y = 0 if pos_y == -1 else pos_y + 1
+
+    count = 0
+    # Horizontal
+    for i in range(max(0, pos_x - 3), min(pos_x + 3, BOARDWIDTH - 1) + 1):
+        if board[i][pos_y] == tile:
+            count += 1
+            if count > 3:
+                return True
+        else:
+            count = 0
+
+    # Vertical
+    count = 0
+    for i in range(max(0, pos_y - 3), min(pos_y + 3, BOARDHEIGHT - 1) + 1):
+        if board[pos_x][i] == tile:
+            count += 1
+            if count > 3:
+                return True
+        else:
+            count = 0
+
+    # Diagonals
+    count = 0
+    x = 0
+    y = 0
+    for i in range(-3, +4):
+        x = pos_x + i
+        y = pos_y + i
+        try:
+            # Main diagonal
+            if board[x][y] == tile and x >= 0 and y >= 0:
+                count += 1
+                if count > 3:
+                    return True
+            else:
+                count = 0
+        except IndexError:
+            pass
+
+    count = 0
+    # Other diagonal
+    for i in range(-3, +4):
+        x = pos_x + i
+        y = pos_y - i
+        try:
+            if board[x][y] == tile and x >= 0 and y >= 0:
+                count += 1
+                if count > 3:
+                    return True
+            else:
+                count = 0
+        except IndexError:
+            pass
+
+    return False
+
+
 def play_without_ui(agent_1, agent_2):
     # Set up a blank board data structure.
     board = getNewBoard()
@@ -328,7 +389,7 @@ def play_without_ui(agent_1, agent_2):
             column = agent_2(board)
 
         makeMove(board, player, column)
-        if isWinner(board, player):
+        if wasWinningMove(board, player, column):
             return player
         player *= -1  # switch to other player's turn
         if isBoardFull(board):
@@ -336,6 +397,23 @@ def play_without_ui(agent_1, agent_2):
             return 0
 
 
+# def getReward(board, player, column):
+#     if isBoardFull(board):
+#         return 0.5
+#     if wasWinningMove(board, player, column):
+#         return 2
+#     return -1
+
+
 if __name__ == '__main__':
-    play_with_ui(getComputerMove, getComputerMove)
+    # play_with_ui(getComputerMove, getComputerMove)
+
+    # for i in range(10000):
     print play_without_ui(getComputerMove, getComputerMove)
+    #     # board = [[None, None, 1, -1, 1, 1], [1, -1, 1, 1, -1, 1], [None, 1, -1, -1, -1, 1], [None, None, 1, -1, -1, -1],
+    #     #          [None, None, None, 1, 1, -1], [None, None, None, 1, -1, -1], [1, -1, -1, -1, 1, 1]]
+    #     #
+    #     # player = 1
+    #     # column = 3
+    #     # print wasWinningMove(board, tile=player, pos_x=column)
+    #     # print isWinner(board, player)
