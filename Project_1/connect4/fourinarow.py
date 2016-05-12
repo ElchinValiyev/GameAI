@@ -3,7 +3,10 @@
 # http://inventwithpython.com/pygame
 # Released under a "Simplified BSD" license
 
-import random, copy, sys, pygame
+import copy
+import pygame
+import random
+import sys
 from pygame.locals import *
 
 BOARDWIDTH = 7  # how many spaces wide the board is
@@ -27,14 +30,14 @@ WHITE = (255, 255, 255)
 BGCOLOR = BRIGHTBLUE
 TEXTCOLOR = WHITE
 
-RED = 'red'
-BLACK = 'black'
+RED = 1
+BLACK = -1
 EMPTY = None
-HUMAN = -1
-COMPUTER = 1
+HUMAN = 1
+COMPUTER = -1
 
 
-def main():
+def play_with_ui(agent_1, agent_2):
     global FPSCLOCK, DISPLAYSURF, REDPILERECT, BLACKPILERECT, REDTOKENIMG
     global BLACKTOKENIMG, BOARDIMG, ARROWIMG, ARROWRECT, HUMANWINNERIMG
     global COMPUTERWINNERIMG, WINNERRECT, TIEWINNERIMG
@@ -65,26 +68,12 @@ def main():
     ARROWRECT.left = REDPILERECT.right + 10
     ARROWRECT.centery = REDPILERECT.centery
 
-    isFirstGame = True
-
     while True:
-        runGame(isFirstGame)
-        isFirstGame = False
+        runGame(agent_1, agent_2)
 
 
-def runGame(isFirstGame):
-    if isFirstGame:
-        # Let the computer go first on the first game, so the player
-        # can see how the tokens are dragged from the token piles.
-        turn = COMPUTER
-        showHelp = True
-    else:
-        # Randomly choose who goes first.
-        if random.randint(0, 1) == 0:
-            turn = COMPUTER
-        else:
-            turn = HUMAN
-        showHelp = False
+def runGame(agent_1, agent_2):
+    turn = HUMAN
 
     # Set up a blank board data structure.
     mainBoard = getNewBoard()
@@ -92,7 +81,7 @@ def runGame(isFirstGame):
     while True:  # main game loop
         if turn == HUMAN:
             # Human player's turn.
-            column = getComputerMove(mainBoard)
+            column = agent_1(mainBoard)
             animateComputerMoving(mainBoard, column, HUMAN)
             makeMove(mainBoard, RED, column)
             if isWinner(mainBoard, RED):
@@ -101,7 +90,7 @@ def runGame(isFirstGame):
             turn = COMPUTER  # switch to other player's turn
         else:
             # Computer player's turn.
-            column = getComputerMove(mainBoard)
+            column = agent_2(mainBoard)
             animateComputerMoving(mainBoard, column, COMPUTER)
             makeMove(mainBoard, BLACK, column)
             if isWinner(mainBoard, BLACK):
@@ -175,13 +164,13 @@ def getNewBoard():
 def animateDroppingToken(board, column, color):
     x = XMARGIN + column * SPACESIZE
     y = YMARGIN - SPACESIZE
-    dropSpeed = 1.0
+    dropSpeed = 1.5
 
     lowestEmptySpace = getLowestEmptySpace(board, column)
 
     while True:
         y += int(dropSpeed)
-        dropSpeed += 0.5
+        # dropSpeed += 0.5
         if int((y - YMARGIN) / SPACESIZE) >= lowestEmptySpace:
             return
         drawBoard(board, {'x': x, 'y': y, 'color': color})
@@ -198,20 +187,20 @@ def animateComputerMoving(board, column, player):
         color = RED
         x = REDPILERECT.left
         y = REDPILERECT.top
-    speed = 1.0
+    speed = 1.5
     # moving the black tile up
     while y > (YMARGIN - SPACESIZE):
         y -= int(speed)
-        speed += 0.5
+        # speed += 0.5
         drawBoard(board, {'x': x, 'y': y, 'color': color})
         pygame.display.update()
         FPSCLOCK.tick()
     # moving the black tile over
     y = YMARGIN - SPACESIZE
-    speed = 1.0
-    while x*player > player*(XMARGIN + column * SPACESIZE):
-        x -= player*int(speed)
-        speed += 0.5
+    speed = 1.5
+    while x * player < player * (XMARGIN + column * SPACESIZE):
+        x += player * int(speed)
+        # speed += 0.5
         drawBoard(board, {'x': x, 'y': y, 'color': color})
         pygame.display.update()
         FPSCLOCK.tick()
@@ -222,7 +211,7 @@ def animateComputerMoving(board, column, player):
 def getComputerMove(board):
     potentialMoves = getPotentialMoves(board, BLACK, DIFFICULTY)
     # get the best fitness from the potential moves
-    bestMoveFitness = -1
+    bestMoveFitness = -10000
     for i in range(BOARDWIDTH):
         if potentialMoves[i] > bestMoveFitness and isValidMove(board, i):
             bestMoveFitness = potentialMoves[i]
@@ -326,5 +315,27 @@ def isWinner(board, tile):
     return False
 
 
+def play_without_ui(agent_1, agent_2):
+    # Set up a blank board data structure.
+    board = getNewBoard()
+    player = 1
+
+    while True:  # main game loop
+        if player == 1:
+            # Human player's turn.
+            column = agent_1(board)
+        else:
+            column = agent_2(board)
+
+        makeMove(board, player, column)
+        if isWinner(board, player):
+            return player
+        player *= -1  # switch to other player's turn
+        if isBoardFull(board):
+            # A completely filled board means it's a tie.
+            return 0
+
+
 if __name__ == '__main__':
-    main()
+    play_with_ui(getComputerMove, getComputerMove)
+    print play_without_ui(getComputerMove, getComputerMove)
