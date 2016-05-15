@@ -9,6 +9,7 @@ import random
 import sys
 import numpy as np
 from pygame.locals import *
+import matplotlib.pyplot as plt
 
 BOARDWIDTH = 7  # how many spaces wide the board is
 BOARDHEIGHT = 6  # how many spaces tall the board is
@@ -109,7 +110,7 @@ def runGame(agent_1, agent_2):
         if isBoardFull(mainBoard):
             # A completely filled board means it's a tie.
             winnerImg = TIEWINNERIMG
-            return 0
+            return -2
             break
 
     while True:
@@ -421,10 +422,26 @@ def play_without_ui(agent_1, agent_2):
             return 0
 
 if __name__ == '__main__':
-    counter = 0
+    red_wins = 0
+    black_wins = 0
+    tie = 0
     for i in range(10):
       y=play_with_ui(getComputerMove, getComputerMove)
       if y==1:
-        counter +=1
-    print counter    
+        red_wins +=1 
+      if y==-1:
+         black_wins +=1
+      if y==-2: 
+         tie +=1  
 
+    print "number of red wins ",red_wins     
+    print "number of black wins ",black_wins  
+    print "number of ties ",tie
+labels = ['Red Wins', 'Black Wins', 'Ties']
+sizes = [red_wins, black_wins, tie]
+colors = ['yellowgreen', 'gold', 'lightskyblue']
+patches, texts = plt.pie(sizes, colors=colors, shadow=True, startangle=90)
+plt.legend(patches, labels, loc="best")
+plt.axis('equal')
+plt.tight_layout()
+plt.show() 
