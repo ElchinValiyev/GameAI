@@ -14,7 +14,7 @@ BOARDWIDTH = 7  # how many spaces wide the board is
 BOARDHEIGHT = 6  # how many spaces tall the board is
 assert BOARDWIDTH >= 4 and BOARDHEIGHT >= 4, 'Board must be at least 4x4.'
 
-DIFFICULTY = 4  # how many moves to look ahead. (>2 is usually too much)
+DIFFICULTY = 3  # how many moves to look ahead. (>2 is usually too much)
 INIT_SPEED = 15
 SPACESIZE = 50  # size of the tokens and individual board spaces in pixels
 
@@ -72,29 +72,28 @@ def play_with_ui(agent_1, agent_2):
     #while True:
     x=runGame(agent_1, agent_2)
     return x
-        
 
 
 def runGame(agent_1, agent_2):
     turn = HUMAN
     player=1
+
     # Set up a blank board data structure.
     mainBoard = getNewBoard()
-    first=True
     while True:  # main game loop
         #print first
         if turn == HUMAN:
             # Human player's turn.
-            column = agent_1(mainBoard,first)
+            column = agent_1(mainBoard)
             first=False
             animateComputerMoving(mainBoard, column, HUMAN)
             makeMove(mainBoard, RED, column)
             if isWinner(mainBoard, RED):
                 winnerImg = HUMANWINNERIMG
-                return 1
+                return player
                 break
-            player *=-1    
             turn = COMPUTER  # switch to other player's turn
+            player *=-1
         else:
             # Computer player's turn.
             column = agent_2(mainBoard)
@@ -102,10 +101,10 @@ def runGame(agent_1, agent_2):
             makeMove(mainBoard, BLACK, column)
             if isWinner(mainBoard, BLACK):
                 winnerImg = COMPUTERWINNERIMG
-                return -1
+                return player
                 break
-            player *=-1    
             turn = HUMAN  # switch to other player's turn
+            player *=-1
 
         if isBoardFull(mainBoard):
             # A completely filled board means it's a tie.
@@ -217,9 +216,15 @@ def animateComputerMoving(board, column, player):
     animateDroppingToken(board, column, color)
 
 
-def getComputerMove(board,first):
+def getComputerMove(board):
+
+    while True:
+      x=random.randint(0,6)
+      if isValidMove(board,x):
+          return x
+          break
     # if first: 
-    return random.randint(0,6)
+    #    return random.randint(0,6)
     # else:
     #   potentialMoves = getPotentialMoves(board, RED, DIFFICULTY)
     # # get the best fitness from the potential moves
@@ -234,20 +239,6 @@ def getComputerMove(board,first):
     #         bestMoves.append(i)       
     # return random.choice(bestMoves)
 
-def getComputer2Move(board):
-    return random.randint(0,6)
-    # potentialMoves = getPotentialMoves(board, BLACK, DIFFICULTY)
-    # # get the best fitness from the potential moves
-    # bestMoveFitness = -10000
-    # for i in range(BOARDWIDTH):
-    #     if potentialMoves[i] > bestMoveFitness and isValidMove(board, i):
-    #         bestMoveFitness = potentialMoves[i]
-    # # find all potential moves that have this best fitness
-    # bestMoves = []
-    # for i in range(len(potentialMoves)):
-    #     if potentialMoves[i] == bestMoveFitness and isValidMove(board, i):
-    #         bestMoves.append(i)       
-    # return random.choice(bestMoves)
 
 
 def getPotentialMoves(board, tile, lookAhead):
@@ -371,6 +362,7 @@ def wasWinningMove(board, tile, pos_x):
                 return True
         else:
             count = 0
+
     # Diagonals
     count = 0
     x = 0
@@ -403,6 +395,7 @@ def wasWinningMove(board, tile, pos_x):
                 count = 0
         except IndexError:
             pass
+
     return False
 
 
@@ -410,56 +403,28 @@ def play_without_ui(agent_1, agent_2):
     # Set up a blank board data structure.
     board = getNewBoard()
     player = 1
-    first=True
     print "Playing!"
     while True:  # main game loop
         if player == 1:
             # Human player's turn.
-            column = agent_1(board,first)
+            column = agent_1(board)
 
         else:
             column = agent_2(board)
         makeMove(board, player, column)
-        #BoardStatus(board)
+        BoardStatus(board)
         if wasWinningMove(board, player, column):
             return player
         player *= -1  # switch to other player's turn
         if isBoardFull(board):
             # A completely filled board means it's a tie.
             return 0
-<<<<<<< HEAD
-   
-
-# def getReward(board, player, column):
-#     if isBoardFull(board):
-#         return 0.5
-#     if wasWinningMove(board, player, column):
-#         return 2
-#     return -1
-
 
 if __name__ == '__main__':
     counter = 0
-    for i in range(100):
-      y=play_with_ui(getComputerMove, getComputer2Move)
-      print y
+    for i in range(10):
+      y=play_with_ui(getComputerMove, getComputerMove)
       if y==1:
-       counter +=1
-    print counter  
-       # for i in range(10):
-       #   x = play_without_ui(getComputerMove, getComputer2Move)
-       #   print "\n"
-       #   print x
-    
-    #     # board = [[None, None, 1, -1, 1, 1], [1, -1, 1, 1, -1, 1], [None, 1, -1, -1, -1, 1], [None, None, 1, -1, -1, -1],
-    #     #          [None, None, None, 1, 1, -1], [None, None, None, 1, -1, -1], [1, -1, -1, -1, 1, 1]]
-    #     #
-    #     # player = 1
-    #     # column = 3
-    #     # print wasWinningMove(board, tile=player, pos_x=column)
-    #     # print isWinner(board, player)
-=======
+        counter +=1
+    print counter    
 
-if __name__ == '__main__':
-    print play_without_ui(getComputerMove, getComputerMove)
->>>>>>> 7022626c21fc52171a404ef31302e219cc6963f2
