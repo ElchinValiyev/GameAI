@@ -1,5 +1,6 @@
 import numpy as np
 import sys
+
 from sklearn import preprocessing
 
 from Board import BoardImplementation as Board
@@ -30,7 +31,7 @@ def minmax(board, player, max_depth, current_depth):
     moves_x, moves_y = board.get_moves()
 
     # Go through each move
-    for i in range(0, moves_x.size):
+    for i in range(moves_x.size):
         new_board = board.copy()
         new_board.make_move((moves_x[i], moves_y[i]))
 

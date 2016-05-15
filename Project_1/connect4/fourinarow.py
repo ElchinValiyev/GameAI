@@ -32,7 +32,7 @@ TEXTCOLOR = WHITE
 
 RED = 1
 BLACK = -1
-EMPTY = None
+EMPTY = 0
 HUMAN = 1
 COMPUTER = -1
 
@@ -339,7 +339,6 @@ def wasWinningMove(board, tile, pos_x):
                 return True
         else:
             count = 0
-
     # Diagonals
     count = 0
     x = 0
@@ -372,7 +371,6 @@ def wasWinningMove(board, tile, pos_x):
                 count = 0
         except IndexError:
             pass
-
     return False
 
 
@@ -396,24 +394,5 @@ def play_without_ui(agent_1, agent_2):
             # A completely filled board means it's a tie.
             return 0
 
-
-# def getReward(board, player, column):
-#     if isBoardFull(board):
-#         return 0.5
-#     if wasWinningMove(board, player, column):
-#         return 2
-#     return -1
-
-
 if __name__ == '__main__':
-    # play_with_ui(getComputerMove, getComputerMove)
-
-    # for i in range(10000):
     print play_without_ui(getComputerMove, getComputerMove)
-    #     # board = [[None, None, 1, -1, 1, 1], [1, -1, 1, 1, -1, 1], [None, 1, -1, -1, -1, 1], [None, None, 1, -1, -1, -1],
-    #     #          [None, None, None, 1, 1, -1], [None, None, None, 1, -1, -1], [1, -1, -1, -1, 1, 1]]
-    #     #
-    #     # player = 1
-    #     # column = 3
-    #     # print wasWinningMove(board, tile=player, pos_x=column)
-    #     # print isWinner(board, player)

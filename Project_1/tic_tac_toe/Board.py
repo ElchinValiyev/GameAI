@@ -3,7 +3,7 @@ import sys
 
 
 class BoardImplementation:
-    def __init__(self, size):
+    def __init__(self, size=3):
         self.is_over = False
         self.player = 1
         self.state = np.zeros((size, size), dtype=int)
