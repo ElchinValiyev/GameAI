@@ -1,8 +1,3 @@
-# Four-In-A-Row (a Connect Four clone)
-# By Al Sweigart al@inventwithpython.com
-# http://inventwithpython.com/pygame
-# Released under a "Simplified BSD" license
-
 import copy
 import pygame
 import random
@@ -77,7 +72,7 @@ def play_with_ui(agent_1, agent_2):
 
 def runGame(agent_1, agent_2):
     turn = HUMAN
-    player=1
+    winner=0
 
     # Set up a blank board data structure.
     mainBoard = getNewBoard()
@@ -91,10 +86,9 @@ def runGame(agent_1, agent_2):
             makeMove(mainBoard, RED, column)
             if isWinner(mainBoard, RED):
                 winnerImg = HUMANWINNERIMG
-                return player
+                winner=1
                 break
             turn = COMPUTER  # switch to other player's turn
-            player *=-1
         else:
             # Computer player's turn.
             column = agent_2(mainBoard)
@@ -102,17 +96,15 @@ def runGame(agent_1, agent_2):
             makeMove(mainBoard, BLACK, column)
             if isWinner(mainBoard, BLACK):
                 winnerImg = COMPUTERWINNERIMG
-                return player
+                winner=-1
                 break
             turn = HUMAN  # switch to other player's turn
-            player *=-1
 
         if isBoardFull(mainBoard):
             # A completely filled board means it's a tie.
             winnerImg = TIEWINNERIMG
-            return -2
+            winner=-2
             break
-
     while True:
         # Keep looping until player clicks the mouse or quits.
         #drawBoard(mainBoard)
@@ -124,8 +116,8 @@ def runGame(agent_1, agent_2):
                 pygame.quit()
                 sys.exit()
             elif event.type == MOUSEBUTTONUP:
-                return
-
+                 return winner
+    
 
 def makeMove(board, player, column):
     lowest = getLowestEmptySpace(board, column)
