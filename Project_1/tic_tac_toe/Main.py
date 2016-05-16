@@ -5,20 +5,25 @@ import changed_tic_tac_toe as ttt
 from qlearner import QLearner
 
 
-def draw_histogram(winner_list, title):
-    plt.figure()
-    plt.hist(winner_list)
+def draw_chart(winner_list, title):
     plt.title(title)
-    plt.xlabel("Winner")
-    plt.ylabel("Frequency")
+    labels = ['X Wins', 'O Wins', 'Draw']
+    sizes = [winner_list[1], winner_list[-1], winner_list[0]]
+    colors = ['yellowgreen', 'gold', 'lightskyblue']
+    patches, texts = plt.pie(sizes, colors=colors, shadow=True, startangle=90)
+    plt.legend(patches, labels, loc="best")
+    plt.axis('equal')
+    plt.tight_layout()
     plt.show()
 
 
 def show_stats(agent_1, agent_2, title):
-    winner_list = []
+    winner_list = [0, 0, 0]  # draw, X, O
+    winner = 0
     for i in range(0, 1000):
-        winner_list.append(ttt.play(agent_1, agent_2))
-    draw_histogram(winner_list, title)
+        winner = ttt.play(agent_1, agent_2)
+        winner_list[winner] += 1
+    draw_chart(winner_list, title)
 
 
 if __name__ == '__main__':

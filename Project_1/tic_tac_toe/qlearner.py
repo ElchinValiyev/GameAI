@@ -21,7 +21,7 @@ class QLearner:
     def __give_feedback(self, current_board, feed_back):
         if current_board.is_over:
             expected = feed_back  # reward from terminal state
-        else:  # max reward for current state
+        else:  # max q-value for current state
             expected = self.__get_max_q(current_board)
         old_state_action = self.last_state + self.last_action
         q_old = self.qvalues.get(old_state_action, 0)
@@ -32,7 +32,7 @@ class QLearner:
     def __get_max_q(self, current_board):
         # find max q value for possible actions
         xs, ys = current_board.get_moves()
-        state = str(current_board.state.tolist())
+        state = str(current_board.state)
         max_q = self.qvalues.get(state + str(xs[0]) + str(ys[0]), 0)
         for i in range(xs.size):
             next_q = self.qvalues.get(state + str(xs[i]) + str(ys[i]), 0)
@@ -40,39 +40,38 @@ class QLearner:
                 max_q = next_q
         return max_q
 
-    def __get_move(self, board):
-        # playing randomly for exploration
-        return agent.get_random_move(board)
-
     def __train(self):
         print "Q-learning started!"
         for i in range(self.GAMES):
             if i % 1000 == 0:
                 print "Game #" + str(i) + " played!"
             # initialize 3x3 tic tac toe board
-            board = Board(3)
+            board = Board()
+            winner = 0
             while board.move_still_possible():
                 if board.player == 1:  # X-player
-                    move = self.__get_move(board)
-                    self.last_state = str(board.state.tolist())
-                    self.last_action = str(move[0]) + str(move[1])
+                    move = agent.get_random_move(board)
                     self.__give_feedback(board, 0)
+                    self.last_state = str(board.state)
+                    self.last_action = str(move[0]) + str(move[1])
                 else:  # O-player
                     move = agent.get_random_move(board)
-
                 board.make_move(move)
                 # evaluate game state
                 if board.game_is_over():
                     # return winner
-                    self.__give_feedback(board, 10 * board.player)
+                    winner = board.player
+                    self.__give_feedback(board, 10 * winner)
                     break
-            self.__give_feedback(board, 5)
+            # if game ended in a draw
+            if winner == 0:
+                self.__give_feedback(board, 5)
         print "Q-learning finished!"
 
     def get_max_q_move(self, current_board):
         xs, ys = current_board.get_moves()
         x, y = xs[0], ys[0]
-        state = str(current_board.state.tolist())
+        state = str(current_board.state)
         max_q = self.qvalues.get(state + str(x) + str(y), 0)
         for i in range(xs.size):
             next_q = self.qvalues.get(state + str(xs[i]) + str(ys[i]), 0)
