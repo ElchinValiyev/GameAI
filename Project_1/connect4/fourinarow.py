@@ -15,7 +15,7 @@ INIT_SPEED = 15
 SPACESIZE = 50  # size of the tokens and individual board spaces in pixels
 
 FPS = 60  # frames per second to update the screen
-WINDOWWIDTH = 480  # width of the program's window, in pixels
+WINDOWWIDTH = 520  # width of the program's window, in pixels
 WINDOWHEIGHT = 480  # height in pixels
 
 XMARGIN = int((WINDOWWIDTH - BOARDWIDTH * SPACESIZE) / 2)
@@ -64,15 +64,42 @@ def play_with_ui(agent_1, agent_2):
     ARROWRECT = ARROWIMG.get_rect()
     ARROWRECT.left = REDPILERECT.right + 10
     ARROWRECT.centery = REDPILERECT.centery
-
-    #while True:
-    x=runGame(agent_1, agent_2)
-    return x
+    red_wins = 0
+    black_wins = 0
+    tie = 0
+    for i in range(10):
+     y,x=runGame(agent_1, agent_2)
+     #return x
+     if y==1:
+        red_wins +=1 
+     if y==-1:
+         black_wins +=1
+     if y==-2: 
+         tie +=1
+     if x==-1 or i==9:
+        pygame.quit()
+        labels = ['Red Wins', 'Black Wins', 'Ties']
+        sizes = [red_wins, black_wins, tie]
+        colors = ['yellowgreen', 'gold', 'lightskyblue']
+        patches, texts = plt.pie(sizes, colors=colors, shadow=True, startangle=90)
+        plt.legend(patches, labels, loc="best")
+        plt.axis('equal')
+        plt.tight_layout()
+        plt.show()
+        print "number of red wins ",red_wins 
+        print "number of black wins ",black_wins  
+        sys.exit()  
+              
+    print "number of red wins ",red_wins     
+    print "number of black wins ",black_wins  
+    print "number of ties ",tie
+   
 
 
 def runGame(agent_1, agent_2):
     turn = HUMAN
     winner=0
+    state =0
 
     # Set up a blank board data structure.
     mainBoard = getNewBoard()
@@ -107,16 +134,26 @@ def runGame(agent_1, agent_2):
             break
     while True:
         # Keep looping until player clicks the mouse or quits.
-        #drawBoard(mainBoard)
+        drawBoard(mainBoard)
         DISPLAYSURF.blit(winnerImg, WINNERRECT)
         pygame.display.update()
         FPSCLOCK.tick()
+
         for event in pygame.event.get():  # event handling loop
             if event.type == QUIT or (event.type == KEYUP and event.key == K_ESCAPE):
-                pygame.quit()
-                sys.exit()
+                state=-1
+                return winner,state
             elif event.type == MOUSEBUTTONUP:
-                 return winner
+                return winner,state
+        # for testing , when you dont want to click everytime to start a new game!      
+        # for event in pygame.event.get():  # event handling loop
+        #     if event.type == QUIT or (event.type == KEYUP and event.key == K_ESCAPE):
+        #         state=-1
+        #         return winner,state
+        #         # pygame.quit()
+        #         # sys.exit()        
+            
+        # return winner,state
     
 
 def makeMove(board, player, column):
@@ -215,22 +252,6 @@ def getComputerMove(board):
       x=random.randint(0,6)
       if isValidMove(board,x):
           return x
-          break
-    # if first: 
-    #    return random.randint(0,6)
-    # else:
-    #   potentialMoves = getPotentialMoves(board, RED, DIFFICULTY)
-    # # get the best fitness from the potential moves
-    #   bestMoveFitness = -10000
-    #   for i in range(BOARDWIDTH):
-    #     if potentialMoves[i] > bestMoveFitness and isValidMove(board, i):
-    #         bestMoveFitness = potentialMoves[i]
-    # # find all potential moves that have this best fitness
-    #   bestMoves = []
-    #   for i in range(len(potentialMoves)):
-    #     if potentialMoves[i] == bestMoveFitness and isValidMove(board, i):
-    #         bestMoves.append(i)       
-    # return random.choice(bestMoves)
 
 
 
@@ -331,67 +352,6 @@ def isWinner(board, tile):
                 return True
     return False
 
-
-def wasWinningMove(board, tile, pos_x):
-    pos_y = getLowestEmptySpace(board, pos_x)
-    pos_y = 0 if pos_y == -1 else pos_y + 1
-
-    count = 0
-    # Horizontal
-    for i in range(max(0, pos_x - 3), min(pos_x + 3, BOARDWIDTH - 1) + 1):
-        if board[i][pos_y] == tile:
-            count += 1
-            if count > 3:
-                return True
-        else:
-            count = 0
-
-    # Vertical
-    count = 0
-    for i in range(max(0, pos_y - 3), min(pos_y + 3, BOARDHEIGHT - 1) + 1):
-        if board[pos_x][i] == tile:
-            count += 1
-            if count > 3:
-                return True
-        else:
-            count = 0
-
-    # Diagonals
-    count = 0
-    x = 0
-    y = 0
-    for i in range(-3, +4):
-        x = pos_x + i
-        y = pos_y + i
-        try:
-            # Main diagonal
-            if board[x][y] == tile and x >= 0 and y >= 0:
-                count += 1
-                if count > 3:
-                    return True
-            else:
-                count = 0
-        except IndexError:
-            pass
-
-    count = 0
-    # Other diagonal
-    for i in range(-3, +4):
-        x = pos_x + i
-        y = pos_y - i
-        try:
-            if board[x][y] == tile and x >= 0 and y >= 0:
-                count += 1
-                if count > 3:
-                    return True
-            else:
-                count = 0
-        except IndexError:
-            pass
-
-    return False
-
-
 def play_without_ui(agent_1, agent_2):
     # Set up a blank board data structure.
     board = getNewBoard()
@@ -414,26 +374,4 @@ def play_without_ui(agent_1, agent_2):
             return 0
 
 if __name__ == '__main__':
-    red_wins = 0
-    black_wins = 0
-    tie = 0
-    for i in range(10):
-      y=play_with_ui(getComputerMove, getComputerMove)
-      if y==1:
-        red_wins +=1 
-      if y==-1:
-         black_wins +=1
-      if y==-2: 
-         tie +=1  
-
-    print "number of red wins ",red_wins     
-    print "number of black wins ",black_wins  
-    print "number of ties ",tie
-labels = ['Red Wins', 'Black Wins', 'Ties']
-sizes = [red_wins, black_wins, tie]
-colors = ['yellowgreen', 'gold', 'lightskyblue']
-patches, texts = plt.pie(sizes, colors=colors, shadow=True, startangle=90)
-plt.legend(patches, labels, loc="best")
-plt.axis('equal')
-plt.tight_layout()
-plt.show() 
+ play_with_ui(getComputerMove, getComputerMove)    
