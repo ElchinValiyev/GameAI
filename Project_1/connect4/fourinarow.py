@@ -64,37 +64,38 @@ def play_with_ui(agent_1, agent_2):
     ARROWRECT = ARROWIMG.get_rect()
     ARROWRECT.left = REDPILERECT.right + 10
     ARROWRECT.centery = REDPILERECT.centery
+    
     red_wins = 0
     black_wins = 0
     tie = 0
+ 
     for i in range(10):
-     y,x=runGame(agent_1, agent_2)
-     #return x
-     if y==1:
+     result,state=runGame(agent_1, agent_2)
+     if result==1:
         red_wins +=1 
-     if y==-1:
+     elif result==-1:
          black_wins +=1
-     if y==-2: 
+     elif result==-2: 
          tie +=1
-     if x==-1 or i==9:
+     if state==-1 or i==9:
         pygame.quit()
-        labels = ['Red Wins', 'Black Wins', 'Ties']
-        sizes = [red_wins, black_wins, tie]
-        colors = ['yellowgreen', 'gold', 'lightskyblue']
-        patches, texts = plt.pie(sizes, colors=colors, shadow=True, startangle=90)
-        plt.legend(patches, labels, loc="best")
-        plt.axis('equal')
-        plt.tight_layout()
-        plt.show()
-        print "number of red wins ",red_wins 
-        print "number of black wins ",black_wins  
+        plotResults(red_wins, black_wins, tie)
         sys.exit()  
-              
+
+
+def plotResults(red_wins,black_wins,tie):
+    labels = ['Red Wins', 'Black Wins', 'Ties']
+    sizes = [red_wins, black_wins, tie]
+    colors = ['yellowgreen', 'gold', 'lightskyblue']
+    patches, texts = plt.pie(sizes, colors=colors, shadow=True, startangle=90)
+    plt.legend(patches, labels, loc="best")
+    plt.axis('equal')
+    plt.tight_layout()
+    plt.show()
     print "number of red wins ",red_wins     
     print "number of black wins ",black_wins  
     print "number of ties ",tie
-   
-
+          
 
 def runGame(agent_1, agent_2):
     turn = HUMAN
@@ -145,15 +146,6 @@ def runGame(agent_1, agent_2):
                 return winner,state
             elif event.type == MOUSEBUTTONUP:
                 return winner,state
-        # for testing , when you dont want to click everytime to start a new game!      
-        # for event in pygame.event.get():  # event handling loop
-        #     if event.type == QUIT or (event.type == KEYUP and event.key == K_ESCAPE):
-        #         state=-1
-        #         return winner,state
-        #         # pygame.quit()
-        #         # sys.exit()        
-            
-        # return winner,state
     
 
 def makeMove(board, player, column):
@@ -195,7 +187,7 @@ def drawBoard(board, extraToken=None):
 
 
 def getNewBoard():
-    board=np.zeros((BOARDWIDTH,BOARDHEIGHT))
+    board=np.zeros((7,6))
     return board
 
 
@@ -247,54 +239,10 @@ def animateComputerMoving(board, column, player):
 
 
 def getComputerMove(board):
-
     while True:
       x=random.randint(0,6)
       if isValidMove(board,x):
           return x
-
-
-
-def getPotentialMoves(board, tile, lookAhead):
-    if lookAhead == 0 or isBoardFull(board):
-        return [0] * BOARDWIDTH
-
-    if tile == RED:
-        enemyTile = BLACK
-    else:
-        enemyTile = RED
-
-    # Figure out the best move to make.
- 
-    potentialMoves = [0] * BOARDWIDTH
-    for firstMove in range(BOARDWIDTH):
-        dupeBoard = copy.deepcopy(board)
-        if not isValidMove(dupeBoard, firstMove):
-            continue
-        makeMove(dupeBoard, tile, firstMove)
-        if isWinner(dupeBoard, tile):
-            # a winning move automatically gets a perfect fitness
-            potentialMoves[firstMove] = 1
-            break  # don't bother calculating other moves
-        else:
-            # do other player's counter moves and determine best one
-            if isBoardFull(dupeBoard):
-                potentialMoves[firstMove] = 0
-            else:
-                for counterMove in range(BOARDWIDTH):
-                    dupeBoard2 = copy.deepcopy(dupeBoard)
-                    if not isValidMove(dupeBoard2, counterMove):
-                        continue
-                    makeMove(dupeBoard2, enemyTile, counterMove)
-                    if isWinner(dupeBoard2, enemyTile):
-                        # a losing move automatically gets the worst fitness
-                        potentialMoves[firstMove] = -1
-                        break
-                    else:
-                        # do the recursive call to getPotentialMoves()
-                        results = getPotentialMoves(dupeBoard2, tile, lookAhead - 1)
-                        potentialMoves[firstMove] += (sum(results) / BOARDWIDTH) / BOARDWIDTH
-    return potentialMoves
 
 
 def getLowestEmptySpace(board, column):
@@ -321,12 +269,6 @@ def isBoardFull(board):
                 return False
     return True
 
-def BoardStatus(board):
-    #Returns the currnt board state
-    print(np.transpose(np.matrix(board)))
-    print"\n\n"
-    return True        
-
 def isWinner(board, tile):
     # check horizontal spaces
     for x in range(BOARDWIDTH - 3):
@@ -352,26 +294,7 @@ def isWinner(board, tile):
                 return True
     return False
 
-def play_without_ui(agent_1, agent_2):
-    # Set up a blank board data structure.
-    board = getNewBoard()
-    player = 1
-    print "Playing!"
-    while True:  # main game loop
-        if player == 1:
-            # Human player's turn.
-            column = agent_1(board)
-
-        else:
-            column = agent_2(board)
-        makeMove(board, player, column)
-        BoardStatus(board)
-        if wasWinningMove(board, player, column):
-            return player
-        player *= -1  # switch to other player's turn
-        if isBoardFull(board):
-            # A completely filled board means it's a tie.
-            return 0
 
 if __name__ == '__main__':
- play_with_ui(getComputerMove, getComputerMove)    
+   play_with_ui(getComputerMove, getComputerMove) 
+
