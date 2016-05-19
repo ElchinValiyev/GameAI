@@ -485,5 +485,5 @@ def learn_from_random_play(iterations):
 
 if __name__ == '__main__':
    #learn_from_random_play(1000)
-   play_with_ui(getComputerMove,getComputerMove,run_random_game)
+   play_with_ui(getComputerMove,getComputerMove,run_learned_game)
   
