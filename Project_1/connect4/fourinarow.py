@@ -4,6 +4,7 @@ import pygame
 import random
 import sys
 from pygame.locals import *
+from Tkinter import *
 
 BOARDWIDTH = 7  # how many spaces wide the board is
 BOARDHEIGHT = 6  # how many spaces tall the board is
@@ -33,7 +34,9 @@ COMPUTER = -1
 lookup = np.zeros((7, 6))
 
 
+
 def play_with_ui(agent_1, agent_2, agent_3):
+    choise=get_input()
     global FPSCLOCK, DISPLAYSURF, REDPILERECT, BLACKPILERECT, REDTOKENIMG
     global BLACKTOKENIMG, BOARDIMG, ARROWIMG, ARROWRECT, HUMANWINNERIMG
     global COMPUTERWINNERIMG, WINNERRECT, TIEWINNERIMG
@@ -66,26 +69,51 @@ def play_with_ui(agent_1, agent_2, agent_3):
     red_wins = 0
     black_wins = 0
     tie = 0
-    for i in range(10):
-        result, state = agent_3(agent_1, agent_2)
+    while True:
+        result, state = agent_3(agent_1, agent_2,choise)
         if result == 1:
             red_wins += 1
         elif result == -1:
             black_wins += 1
         elif result == -2:
             tie += 1
-        if state == -1 or i == 9:
+        if state == -1:
             pygame.quit()
             plotResults(red_wins, black_wins, tie)
             sys.exit()
 
 
+def get_input():
+    master = Tk()
+    master.wm_title("Select the type of game")
+    master.minsize(width=400,height=50)
+    var = StringVar(master)
+    x='randvsrand'
+    var.set(x) # initial value
+    
+    option = OptionMenu(master, var, "randvsrand", "statvsrand", "statvsstat")
+    option.pack()
+
+    def ok():
+        global seletion
+        x=var.get()
+        seletion=x
+        master.destroy()
+
+    x=var.get()
+    button = Button(master, text="OK",command=ok)
+    button.pack()
+    mainloop()
+    return seletion
+
 def plotResults(red_wins, black_wins, tie):
     labels = ['Red Wins', 'Black Wins', 'Ties']
     sizes = [red_wins, black_wins, tie]
     colors = ['yellowgreen', 'gold', 'lightskyblue']
-    patches, texts = plt.pie(sizes, colors=colors, shadow=True, startangle=90)
-    plt.legend(patches, labels, loc="best")
+    explode = (0.1, 0, 0.1)
+    # patches, texts = plt.pie(sizes, colors=colors, shadow=True, startangle=90)
+    # plt.legend(sizes, labels, loc="best")
+    plt.pie(sizes,colors=colors,explode=explode,labels=labels,autopct='%1.1f%%',shadow=True,startangle=70)
     plt.axis('equal')
     plt.tight_layout()
     plt.show()
@@ -93,8 +121,8 @@ def plotResults(red_wins, black_wins, tie):
     print "number of black wins ", black_wins
     print "number of ties ", tie
 
+def run_game(agent_1, agent_2,agent_3):
 
-def run_random_game(agent_1, agent_2):
     turn = HUMAN
     winner = 0
     state = 0
@@ -106,9 +134,13 @@ def run_random_game(agent_1, agent_2):
     while True:  # main game loop
         if turn == HUMAN:
             # Human player's turn.
-            column = agent_1(mainBoard)
-            animateComputerMoving(mainBoard, column, HUMAN)
-            status, row = makeMove(mainBoard, RED, column)
+            if agent_3!='randvsrand':
+                board, column = next_move(mainBoard, 1)
+                animateComputerMoving(mainBoard, column, HUMAN)
+            else:
+                column = agent_1(mainBoard)
+                animateComputerMoving(mainBoard, column, HUMAN)
+                status, row = makeMove(mainBoard, RED, column)
             if isWinner(mainBoard, RED):
                 winnerImg = HUMANWINNERIMG
                 winner = 1
@@ -116,60 +148,14 @@ def run_random_game(agent_1, agent_2):
             turn = COMPUTER  # switch to other player's turn
         else:
             # Computer player's turn.
-            column = agent_2(mainBoard)
-            animateComputerMoving(mainBoard, column, COMPUTER)
-            status, row = makeMove(mainBoard, BLACK, column)
+            if agent_3=='statvsrand' or agent_3=='randvsrand':
+                column = agent_2(mainBoard)
+                animateComputerMoving(mainBoard, column, COMPUTER)
+                status, row = makeMove(mainBoard, BLACK, column)
+            else:
+                board, column = next_move(mainBoard, -1)
+                animateComputerMoving(mainBoard, column, COMPUTER) 
             # BoardStatus(mainBoard)
-            if isWinner(mainBoard, BLACK):
-                winnerImg = COMPUTERWINNERIMG
-                winner = -1
-                break
-            turn = HUMAN  # switch to other player's turn
-
-        if isBoardFull(mainBoard):
-            # A completely filled board means it's a tie.
-            winnerImg = TIEWINNERIMG
-            winner = -2
-            break
-    while True:
-        # Keep looping until player clicks the mouse or quits.
-        drawBoard(mainBoard)
-        DISPLAYSURF.blit(winnerImg, WINNERRECT)
-        pygame.display.update()
-        FPSCLOCK.tick()
-
-        for event in pygame.event.get():  # event handling loop
-            if event.type == QUIT or (event.type == KEYUP and event.key == K_ESCAPE):
-                print lookup
-                state = -1
-                return winner, state
-            elif event.type == MOUSEBUTTONUP:
-                return winner, state
-
-
-def run_learned_game(agent_1, agent_2):
-    turn = HUMAN
-    winner = 0
-    state = 0
-    lookup1 = np.zeros((7, 6))
-    lookup2 = np.zeros((7, 6))
-    # Set up a blank board data structure.
-    mainBoard = getNewBoard()
-
-    while True:  # main game loop
-        if turn == HUMAN:
-            # Human player's turn.
-            board, column = next_move(mainBoard, 1)
-            animateComputerMoving(mainBoard, column, HUMAN)
-            if isWinner(mainBoard, RED):
-                winnerImg = HUMANWINNERIMG
-                winner = 1
-                break
-            turn = COMPUTER  # switch to other player's turn
-        else:
-            # Computer player's turn.
-            board, column = next_move(mainBoard, -1)
-            animateComputerMoving(mainBoard, column, COMPUTER)
             if isWinner(mainBoard, BLACK):
                 winnerImg = COMPUTERWINNERIMG
                 winner = -1
@@ -384,64 +370,6 @@ def isWinner(board, tile):
                 return True
     return False
 
-
-def wasWinningMove(board, tile, pos_x):
-    pos_y = getLowestEmptySpace(board, pos_x)
-    pos_y = 0 if pos_y == -1 else pos_y + 1
-    count = 0
-    # Horizontal
-    for i in range(max(0, pos_x - 3), min(pos_x + 3, BOARDWIDTH - 1) + 1):
-        if board[i][pos_y] == tile:
-            count += 1
-            if count > 3:
-                return True
-        else:
-            count = 0
-
-    # Vertical
-    count = 0
-    for i in range(max(0, pos_y - 3), min(pos_y + 3, BOARDHEIGHT - 1) + 1):
-        if board[pos_x][i] == tile:
-            count += 1
-            if count > 3:
-                return True
-        else:
-            count = 0
-    # Diagonals
-    count = 0
-    x = 0
-    y = 0
-    for i in range(-3, +4):
-        x = pos_x + i
-        y = pos_y + i
-        try:
-            # Main diagonal
-            if board[x][y] == tile and x >= 0 and y >= 0:
-                count += 1
-                if count > 3:
-                    return True
-            else:
-                count = 0
-        except IndexError:
-            pass
-
-    count = 0
-    # Other diagonal
-    for i in range(-3, +4):
-        x = pos_x + i
-        y = pos_y - i
-        try:
-            if board[x][y] == tile and x >= 0 and y >= 0:
-                count += 1
-                if count > 3:
-                    return True
-            else:
-                count = 0
-        except IndexError:
-            pass
-    return False
-
-
 def play_without_ui(agent_1, agent_2):
     # Set up a blank board data structure.
     board = getNewBoard()
@@ -480,12 +408,77 @@ def build_look(player, lookup1, lookup2):
 
 
 def learn_from_random_play(iterations):
-    # randomly plays the game and saves the lookup table which is the number of times a field was used by the winning player
+    # randomly plays the game and saves the lookup table 
+    # which is the number of times a field was used by the winning player
     for i in range(iterations):
         play_without_ui(getComputerMove, getComputerMove)
-    np.save("test_table.npy", lookup)
+    np.save("lookup.npy", lookup)
+
+# 
+def generate_statistics(agent_1,agent_2,iterations):
+    red_wins = 0
+    black_wins = 0
+    tie = 0
+    x=get_input()
+    print x
+    for i in range(iterations):
+        result = gather_stats(agent_1, agent_2,x)
+        if result == 1:
+            red_wins += 1
+        elif result == -1:
+            black_wins += 1
+        elif result == -2:
+            tie += 1
+    pygame.quit()
+    plotResults(red_wins, black_wins, tie)
+
+
+def gather_stats(agent_1, agent_2,choise):
+    turn = HUMAN
+    winner = 0
+    state = 0
+    lookup1 = np.zeros((7, 6))
+    lookup2 = np.zeros((7, 6))
+    # Set up a blank board data structure.
+    mainBoard = getNewBoard()
+
+    while True:  # main game loop
+        if turn == HUMAN:
+            # Human player's turn.
+            if choise!='randvsrand':
+                board, column = next_move(mainBoard, 1)
+            else:
+                column = agent_1(mainBoard)
+                status, row = makeMove(mainBoard, RED, column)                
+
+            if isWinner(mainBoard, RED):
+                # winnerImg = HUMANWINNERIMG
+                winner = 1
+                break
+            turn = COMPUTER  # switch to other player's turn
+        else:
+            # Computer player's turn.
+            # board, column = next_move(mainBoard, -1)
+            if choise=='statvsstat':
+                board, column = next_move(mainBoard, -1)
+            else:
+                column = agent_2(mainBoard)
+                status, row = makeMove(mainBoard, BLACK, column)   
+
+            if isWinner(mainBoard, BLACK):
+                # winnerImg = COMPUTERWINNERIMG
+                winner = -1
+                break
+            turn = HUMAN  # switch to other player's turn
+
+        if isBoardFull(mainBoard):
+            # A completely filled board means it's a tie.
+            winner = -2
+            break
+    return winner
 
 
 if __name__ == '__main__':
-    # learn_from_random_play(1000)
-    play_with_ui(getComputerMove, getComputerMove, run_learned_game)
+    # learn_from_random_play(10000)
+    # generate_statistics(getComputerMove,getComputerMove,10000)
+    play_with_ui(getComputerMove, getComputerMove, run_game)

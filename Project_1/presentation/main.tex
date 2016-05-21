@@ -256,14 +256,78 @@ Eval(n) = 3 * X2 + X1 – (3 * O2 + O1) \\
 
 \section{Connect 4}
 
-\subsection{Another Subsection}
+\subsection{Random Play}
+\begin{frame}{Evaluating the results}
 
-\begin{frame}{Connect 4 Slide 1}
-	content ...
+How to pick next move from possible/valid ones? \\
+We choose randomly! 
+\begin{columns}
+	 	\begin{column}{0.5\textwidth}
+			\centering
+			\includegraphics[scale = .75]{random_algo.png}
+	 	\end{column}
+ 		\begin{column}{0.5\textwidth}
+			\centering
+			\includegraphics[scale = 0.1]{valid.jpeg}	
+	 	\end{column}
+	 \end{columns}
 \end{frame}
 
-\begin{frame}{Connect 4 Slide 2}
-	content...
+
+\begin{frame}{Performance and Issues}
+  \begin{columns}
+	 	\begin{column}{0.4\textwidth}
+			Random Vs Random
+			\centering
+			\includegraphics[scale = 0.35]{randVsrand.png}
+	 	\end{column}
+	\end{columns} 	
+
+		
+	\begin{itemize}
+ 		\item No strategy is followed , moves are picked completely radomly 
+	\end{itemize}
+
+\end{frame}
+\subsection{Statistical Approach} 
+\begin{frame}{Learning from random play}
+
+\begin{block}{Using a lookup table}
+
+
+\begin{itemize}
+ \item We store all the bins used by a winner over a million games in a lookup matrix
+ \item From all the valid moves in a given state we pick the one which was used the most in lookup matrix 
+
+\end{itemize}
+
+\end{block}
+    \begin{columns}
+	 	\begin{column}{0.4\textwidth}
+			
+			\includegraphics[scale = .1005]{valid.jpeg}
+	 	\end{column}
+ 		\begin{column}{0.5\textwidth}
+			
+			\includegraphics[scale = 0.45]{table.png}	
+	 	\end{column}
+	 \end{columns}
+\end{frame}
+
+\begin{frame}{Performance}
+    \begin{columns}
+	 	\begin{column}{0.5\textwidth}
+	 	Statistics Approach VS Random
+			\centering
+			\includegraphics[scale = .35]{statVsrand.png}
+	 	\end{column}
+ 		\begin{column}{0.5\textwidth}
+ 		Statistics Approach VS Statistical Approach
+			\centering
+			\includegraphics[scale = 0.35]{statVsstat.png}	
+	 	\end{column}
+	 \end{columns}
+	
 \end{frame}
 
 
@@ -286,3 +350,5 @@ Eval(n) = 3 * X2 + X1 – (3 * O2 + O1) \\
 \end{document}
 
 
+\grid
+\grid
