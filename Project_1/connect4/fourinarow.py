@@ -2,9 +2,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pygame
 import random
-import sys
-from pygame.locals import *
 from Tkinter import *
+from pygame.locals import *
 
 BOARDWIDTH = 7  # how many spaces wide the board is
 BOARDHEIGHT = 6  # how many spaces tall the board is
@@ -34,9 +33,8 @@ COMPUTER = -1
 lookup = np.zeros((7, 6))
 
 
-
 def play_with_ui(agent_1, agent_2, agent_3):
-    choise=get_input()
+    choise = get_input()
     global FPSCLOCK, DISPLAYSURF, REDPILERECT, BLACKPILERECT, REDTOKENIMG
     global BLACKTOKENIMG, BOARDIMG, ARROWIMG, ARROWRECT, HUMANWINNERIMG
     global COMPUTERWINNERIMG, WINNERRECT, TIEWINNERIMG
@@ -70,7 +68,7 @@ def play_with_ui(agent_1, agent_2, agent_3):
     black_wins = 0
     tie = 0
     while True:
-        result, state = agent_3(agent_1, agent_2,choise)
+        result, state = agent_3(agent_1, agent_2, choise)
         if result == 1:
             red_wins += 1
         elif result == -1:
@@ -86,34 +84,46 @@ def play_with_ui(agent_1, agent_2, agent_3):
 def get_input():
     master = Tk()
     master.wm_title("Select the type of game")
-    master.minsize(width=400,height=50)
+    master.minsize(width=400, height=50)
     var = StringVar(master)
-    x='randvsrand'
-    var.set(x) # initial value
-    
+    x = 'randvsrand'
+    var.set(x)  # initial value
+
     option = OptionMenu(master, var, "randvsrand", "statvsrand", "statvsstat")
     option.pack()
 
     def ok():
         global seletion
-        x=var.get()
-        seletion=x
+        x = var.get()
+        seletion = x
         master.destroy()
 
-    x=var.get()
-    button = Button(master, text="OK",command=ok)
+    x = var.get()
+    button = Button(master, text="OK", command=ok)
     button.pack()
     mainloop()
     return seletion
 
+
 def plotResults(red_wins, black_wins, tie):
+    def make_autopct(values):
+        def my_autopct(pct):
+            if pct == 0:
+                return ""
+            else:
+                return '{p:.1f}% '.format(p=pct)
+
+        return my_autopct
+
+
     labels = ['Red Wins', 'Black Wins', 'Ties']
     sizes = [red_wins, black_wins, tie]
     colors = ['yellowgreen', 'gold', 'lightskyblue']
-    explode = (0.1, 0, 0.1)
+    explode = (0.1, 0, 0)
     # patches, texts = plt.pie(sizes, colors=colors, shadow=True, startangle=90)
     # plt.legend(sizes, labels, loc="best")
-    plt.pie(sizes,colors=colors,explode=explode,labels=labels,autopct='%1.1f%%',shadow=True,startangle=70)
+    plt.pie(sizes, colors=colors, explode=explode, labels=labels, autopct=make_autopct(sizes), shadow=True,
+            startangle=70)
     plt.axis('equal')
     plt.tight_layout()
     plt.show()
@@ -121,8 +131,8 @@ def plotResults(red_wins, black_wins, tie):
     print "number of black wins ", black_wins
     print "number of ties ", tie
 
-def run_game(agent_1, agent_2,agent_3):
 
+def run_game(agent_1, agent_2, agent_3):
     turn = HUMAN
     winner = 0
     state = 0
@@ -134,7 +144,7 @@ def run_game(agent_1, agent_2,agent_3):
     while True:  # main game loop
         if turn == HUMAN:
             # Human player's turn.
-            if agent_3!='randvsrand':
+            if agent_3 != 'randvsrand':
                 board, column = next_move(mainBoard, 1)
                 animateComputerMoving(mainBoard, column, HUMAN)
             else:
@@ -148,14 +158,14 @@ def run_game(agent_1, agent_2,agent_3):
             turn = COMPUTER  # switch to other player's turn
         else:
             # Computer player's turn.
-            if agent_3=='statvsrand' or agent_3=='randvsrand':
+            if agent_3 == 'statvsrand' or agent_3 == 'randvsrand':
                 column = agent_2(mainBoard)
                 animateComputerMoving(mainBoard, column, COMPUTER)
                 status, row = makeMove(mainBoard, BLACK, column)
             else:
                 board, column = next_move(mainBoard, -1)
-                animateComputerMoving(mainBoard, column, COMPUTER) 
-            # BoardStatus(mainBoard)
+                animateComputerMoving(mainBoard, column, COMPUTER)
+                # BoardStatus(mainBoard)
             if isWinner(mainBoard, BLACK):
                 winnerImg = COMPUTERWINNERIMG
                 winner = -1
@@ -370,6 +380,7 @@ def isWinner(board, tile):
                 return True
     return False
 
+
 def play_without_ui(agent_1, agent_2):
     # Set up a blank board data structure.
     board = getNewBoard()
@@ -414,15 +425,16 @@ def learn_from_random_play(iterations):
         play_without_ui(getComputerMove, getComputerMove)
     np.save("lookup.npy", lookup)
 
-# 
-def generate_statistics(agent_1,agent_2,iterations):
+
+#
+def generate_statistics(agent_1, agent_2, iterations):
     red_wins = 0
     black_wins = 0
     tie = 0
-    x=get_input()
+    x = get_input()
     print x
     for i in range(iterations):
-        result = gather_stats(agent_1, agent_2,x)
+        result = gather_stats(agent_1, agent_2, x)
         if result == 1:
             red_wins += 1
         elif result == -1:
@@ -433,7 +445,7 @@ def generate_statistics(agent_1,agent_2,iterations):
     plotResults(red_wins, black_wins, tie)
 
 
-def gather_stats(agent_1, agent_2,choise):
+def gather_stats(agent_1, agent_2, choise):
     turn = HUMAN
     winner = 0
     state = 0
@@ -445,11 +457,11 @@ def gather_stats(agent_1, agent_2,choise):
     while True:  # main game loop
         if turn == HUMAN:
             # Human player's turn.
-            if choise!='randvsrand':
+            if choise != 'randvsrand':
                 board, column = next_move(mainBoard, 1)
             else:
                 column = agent_1(mainBoard)
-                status, row = makeMove(mainBoard, RED, column)                
+                status, row = makeMove(mainBoard, RED, column)
 
             if isWinner(mainBoard, RED):
                 # winnerImg = HUMANWINNERIMG
@@ -459,11 +471,11 @@ def gather_stats(agent_1, agent_2,choise):
         else:
             # Computer player's turn.
             # board, column = next_move(mainBoard, -1)
-            if choise=='statvsstat':
+            if choise == 'statvsstat':
                 board, column = next_move(mainBoard, -1)
             else:
                 column = agent_2(mainBoard)
-                status, row = makeMove(mainBoard, BLACK, column)   
+                status, row = makeMove(mainBoard, BLACK, column)
 
             if isWinner(mainBoard, BLACK):
                 # winnerImg = COMPUTERWINNERIMG
@@ -480,5 +492,5 @@ def gather_stats(agent_1, agent_2,choise):
 
 if __name__ == '__main__':
     # learn_from_random_play(10000)
-    # generate_statistics(getComputerMove,getComputerMove,10000)
-    play_with_ui(getComputerMove, getComputerMove, run_game)
+    generate_statistics(getComputerMove, getComputerMove, 10000)
+    # play_with_ui(getComputerMove, getComputerMove, run_game)
