@@ -499,5 +499,5 @@ def gather_stats(agent_1, agent_2, game_choice):
 
 if __name__ == '__main__':
     # learn_from_random_play(10000)
-    # generate_statistics(getComputerMove, getComputerMove, 10000)
-    play_with_ui(getComputerMove, getComputerMove)
+    generate_statistics(getComputerMove, getComputerMove, 10000)
+    # play_with_ui(getComputerMove, getComputerMove)

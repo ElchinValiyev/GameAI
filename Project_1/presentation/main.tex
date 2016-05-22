@@ -156,12 +156,11 @@ def minmax(board, player, max_depth, current_depth):
 
 \defverbatim[colored]\Probabilistic{
 \begin{lstlisting}[basicstyle=\tiny]
-1. keep data structure with counters for each possible move;
-2. for 10000 (or any large number) times:
-3. 	 play_game;
-4. 	 update counters of winner's moves;
-5. normalize all counters in data structure -> obtain moves' probabilities;
-6. write probabilities to file.
+1.	for 10000(or any large number)times:
+		play_game
+		store moves of both player
+		update the counter of winner moves
+	store the winner moves in a file	
 \end{lstlisting}
 }
 
@@ -172,6 +171,26 @@ def minmax(board, player, max_depth, current_depth):
 	 ...
 3.	 next move = possible move which has maximal probability;
 	 ...
+\end{lstlisting}
+}
+
+
+
+
+\defverbatim[colored]\Statistical{
+\begin{lstlisting}[basicstyle=\tiny]
+1. for 10000 (or any large number) times:
+2. 	 play_game;
+3. 	 update counters of winner's moves;
+5. write winner`s counter to a file.
+\end{lstlisting}
+}
+
+\defverbatim[colored]\StatisticalPlay{
+\begin{lstlisting}[basicstyle=\tiny]
+1. read the lookup from file;
+2. Find all valid moves:
+3. Pick the highest value
 \end{lstlisting}
 }
 
@@ -302,7 +321,7 @@ Eval(n) = 3 * X2 + X1 – (3 * O2 + O1) \\
 \section{Connect 4}
 
 \subsection{Random Play}
-\begin{frame}{Evaluating the results}
+\begin{frame}{Playing Strategy}
 
 How to pick next move from possible/valid ones? \\
 We choose randomly! 
@@ -321,16 +340,15 @@ We choose randomly!
 
 \begin{frame}{Performance and Issues}
   \begin{columns}
-	 	\begin{column}{0.4\textwidth}
+	 	\begin{column}{0.3\textwidth}
 			Random Vs Random
-			\centering
 			\includegraphics[scale = 0.35]{randVsrand.png}
 	 	\end{column}
 	\end{columns} 	
 
 		
 	\begin{itemize}
- 		\item No strategy is followed , moves are picked completely radomly 
+ 		\item No strategy is followed,moves are picked completely radomly 
 	\end{itemize}
 
 \end{frame}
@@ -359,22 +377,29 @@ We choose randomly!
 	 \end{columns}
 \end{frame}
 
+\begin{frame}{Pseudo code}
+	\begin{block}{Play using Statistical approach}
+		\Statistical
+	\end{block}
+	
+	\begin{block}{Play using Statistical approach}
+		\StatisticalPlay
+	\end{block}
+\end{frame}
 \begin{frame}{Performance}
-    \begin{columns}
+	    \begin{columns}
 	 	\begin{column}{0.5\textwidth}
 	 	Statistics Approach VS Random
 			\centering
 			\includegraphics[scale = .35]{statVsrand.png}
 	 	\end{column}
  		\begin{column}{0.5\textwidth}
- 		Statistics Approach VS Statistical Approach
+ 		Statistical Approach VS Statistical Approach
 			\centering
 			\includegraphics[scale = 0.35]{statVsstat.png}	
 	 	\end{column}
 	 \end{columns}
-	
 \end{frame}
-
 
 
 % Placing a * after \section means it will not show in the
