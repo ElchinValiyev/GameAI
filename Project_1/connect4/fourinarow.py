@@ -19,10 +19,10 @@ WINDOWHEIGHT = 480  # height in pixels
 XMARGIN = int((WINDOWWIDTH - BOARDWIDTH * SPACESIZE) / 2)
 YMARGIN = int((WINDOWHEIGHT - BOARDHEIGHT * SPACESIZE) / 2)
 
-BRIGHTBLUE = (50, 50, 155)
+Custom_Color = (50, 50, 155)
 WHITE = (255, 255, 255)
 
-BGCOLOR = BRIGHTBLUE
+BGCOLOR = Custom_Color
 TEXTCOLOR = WHITE
 
 RED = 1
@@ -86,10 +86,10 @@ def get_input():
     master.wm_title("Select the type of game")
     master.minsize(width=400, height=50)
     var = StringVar(master)
-    x = 'randvsrand'
-    var.set(x)  # initial value
-
-    option = OptionMenu(master, var, "randvsrand", "statvsrand", "statvsstat")
+    x='Random_Vs_Random'
+    var.set(x) # initial value
+    
+    option = OptionMenu(master, var, "Random_Vs_Random", "Statistical_Vs_Random", "Statistical_Vs_Statistical")
     option.pack()
 
     def ok():
@@ -144,7 +144,7 @@ def run_game(agent_1, agent_2, agent_3):
     while True:  # main game loop
         if turn == HUMAN:
             # Human player's turn.
-            if agent_3 != 'randvsrand':
+            if agent_3!='Random_Vs_Random':
                 board, column = next_move(mainBoard, 1)
                 animateComputerMoving(mainBoard, column, HUMAN)
             else:
@@ -158,14 +158,14 @@ def run_game(agent_1, agent_2, agent_3):
             turn = COMPUTER  # switch to other player's turn
         else:
             # Computer player's turn.
-            if agent_3 == 'statvsrand' or agent_3 == 'randvsrand':
+            if agent_3=='Statistical_Vs_Random' or agent_3=='Random_Vs_Random':
                 column = agent_2(mainBoard)
                 animateComputerMoving(mainBoard, column, COMPUTER)
                 status, row = makeMove(mainBoard, BLACK, column)
             else:
                 board, column = next_move(mainBoard, -1)
                 animateComputerMoving(mainBoard, column, COMPUTER)
-                # BoardStatus(mainBoard)
+
             if isWinner(mainBoard, BLACK):
                 winnerImg = COMPUTERWINNERIMG
                 winner = -1
@@ -186,7 +186,6 @@ def run_game(agent_1, agent_2, agent_3):
 
         for event in pygame.event.get():  # event handling loop
             if event.type == QUIT or (event.type == KEYUP and event.key == K_ESCAPE):
-                print lookup
                 state = -1
                 return winner, state
             elif event.type == MOUSEBUTTONUP:
@@ -237,13 +236,6 @@ def getNewBoard():
     # Create a new board and initilize all fields to zero
     board = np.zeros((BOARDWIDTH, BOARDHEIGHT))
     return board
-
-
-def BoardStatus(board):
-    # Returns the currnt board state
-    print board
-    print"\n\n"
-    return True
 
 
 def animateDroppingToken(board, column, color):
@@ -392,12 +384,10 @@ def play_without_ui(agent_1, agent_2):
             # Human player's turn.
             column = agent_1(board)
             state, row = makeMove(board, player, column)
-            # BoardStatus(board)
             lookup1[column][row] += 1
         else:
             column = agent_2(board)
             state, row = makeMove(board, player, column)
-            # BoardStatus(board)
             lookup2[column][row] += 1
         if wasWinningMove(board, player, column):
             build_look(player, lookup1, lookup2)
@@ -457,7 +447,7 @@ def gather_stats(agent_1, agent_2, choise):
     while True:  # main game loop
         if turn == HUMAN:
             # Human player's turn.
-            if choise != 'randvsrand':
+            if choise!='Random_Vs_Random':
                 board, column = next_move(mainBoard, 1)
             else:
                 column = agent_1(mainBoard)
@@ -471,7 +461,7 @@ def gather_stats(agent_1, agent_2, choise):
         else:
             # Computer player's turn.
             # board, column = next_move(mainBoard, -1)
-            if choise == 'statvsstat':
+            if choise=='Statistical_Vs_Statistical':
                 board, column = next_move(mainBoard, -1)
             else:
                 column = agent_2(mainBoard)
