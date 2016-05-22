@@ -154,6 +154,27 @@ def minmax(board, player, max_depth, current_depth):
 	\end{lstlisting}
 }
 
+\defverbatim[colored]\Probabilistic{
+\begin{lstlisting}[basicstyle=\tiny]
+keep data structure with counters for each possible move;
+for 10000 (or any large number) times:
+	play_game;
+	update counters of winner's moves;
+normalize all counters in data structure -> obtain moves' probabilities;
+write probabilities to file.
+\end{lstlisting}
+}
+
+\defverbatim[colored]\ProbabilisticPlay{
+\begin{lstlisting}[basicstyle=\tiny]
+read probabilities from file
+while move is still possible:
+	...
+	next move = possible move which has maximal probability
+	...
+\end{lstlisting}
+}
+
 
 
 
@@ -173,11 +194,35 @@ def minmax(board, player, max_depth, current_depth):
 
 \subsection{Probabilistic strategy}
 
-\begin{frame}{Probabilistic strategy slide 1}{Optional Subtitle}
-	content ... 
+\begin{frame}{Probabilistic strategy}{Main idea}
+\textbf{Approach:}
+Find out, which positions \textit{usually} (over the huge number of games) contribute to the victory the most and choose one of them as the next state in the game.
+\begin{figure}
+	\includegraphics[scale = 0.5]{victory.jpg}	
+\end{figure}
+\end{frame}
+
+\begin{frame}{Probabilistic strategy}{Pseudo code}
+\begin{block}{Learn probabilities}
+\Probabilistic
+
+\end{block}
+\begin{block}{Play using probabilistic approach}
+\ProbabilisticPlay
+\end{block}
 \end{frame}
 
 \begin{frame}{Performance}
+	 \begin{columns}
+	 	\begin{column}{0.5\textwidth}
+	 		\centering
+	 		\includegraphics[scale =0.35]{probVSrandom.png}
+	 	\end{column}
+	 	\begin{column}{0.5\textwidth}
+	 		\centering
+	 		\includegraphics[scale =0.35]{randVSprob.png}
+	 	\end{column}
+	 \end{columns}
 	
 \end{frame}
 

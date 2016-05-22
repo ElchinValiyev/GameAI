@@ -39,8 +39,11 @@ if __name__ == '__main__':
     # random vs random
     show_stats(agent.get_random_move, agent.get_random_move, "Random(X) vs Random(O)")
 
-    # random vs probabilistic
+    # probabilistic vs random
     show_stats(agent.get_probabilistic_move, agent.get_random_move, "Probabilistic(X) vs Random(O)")
+
+    # random vs probabilistic
+    show_stats(agent.get_random_move, agent.get_probabilistic_move, "Random(X) vs Probabilistic(O)")
 
     # minmax vs random
     show_stats(agent.get_minmax_move, agent.get_random_move, "Minmax(X) vs Random(O)")
