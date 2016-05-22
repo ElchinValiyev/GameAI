@@ -156,22 +156,22 @@ def minmax(board, player, max_depth, current_depth):
 
 \defverbatim[colored]\Probabilistic{
 \begin{lstlisting}[basicstyle=\tiny]
-keep data structure with counters for each possible move;
-for 10000 (or any large number) times:
-	play_game;
-	update counters of winner's moves;
-normalize all counters in data structure -> obtain moves' probabilities;
-write probabilities to file.
+1. keep data structure with counters for each possible move;
+2.for 10000 (or any large number) times:
+3. 	 play_game;
+4. 	 update counters of winner's moves;
+5. normalize all counters in data structure -> obtain moves' probabilities;
+6. write probabilities to file.
 \end{lstlisting}
 }
 
 \defverbatim[colored]\ProbabilisticPlay{
 \begin{lstlisting}[basicstyle=\tiny]
-read probabilities from file
-while move is still possible:
-	...
-	next move = possible move which has maximal probability
-	...
+1. read probabilities from file;
+2. while move is still possible:
+	 ...
+3.	 next move = possible move which has maximal probability;
+	 ...
 \end{lstlisting}
 }
 
@@ -196,7 +196,7 @@ while move is still possible:
 
 \begin{frame}{Probabilistic strategy}{Main idea}
 \textbf{Approach:}
-Find out, which positions \textit{usually} (over the huge number of games) contribute to the victory the most and choose one of them as the next state in the game.
+Find out, which positions \textit{usually} (over the huge number of games) contribute to the victory the most and choose one of them as the next move in the game.
 \begin{figure}
 	\includegraphics[scale = 0.5]{victory.jpg}	
 \end{figure}
