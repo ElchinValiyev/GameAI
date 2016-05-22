@@ -36,6 +36,7 @@ def show_stats(agent_1, agent_2, title):
 
 
 if __name__ == '__main__':
+
     # random vs random
     show_stats(agent.get_random_move, agent.get_random_move, "Random(X) vs Random(O)")
 

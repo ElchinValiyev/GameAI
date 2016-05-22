@@ -53,16 +53,23 @@ def minmax(board, player, max_depth, current_depth):
 
 
 def learn_probabilities():
+
+    # Global counters for winning moves of X and O
     winX = np.zeros((3, 3))
     winO = np.zeros((3, 3))
+
+    # Learn through 50000 plays
     for i in range(5000):
         board = Board(3)
+
+        # Local counters
         countX = np.zeros((3, 3))
         countO = np.zeros((3, 3))
         while board.move_still_possible():
             move = get_random_move(board)
             x, y = move
 
+            # Update corresponding local counter
             if board.player == 1:
                 countX[x, y] += 1
             else:
@@ -71,14 +78,21 @@ def learn_probabilities():
 
             if board.move_was_winning_move(board.player):
                 winner = board.player
+
+                # Update winner's global counter
                 if winner == 1:
                     winX += countX
                 elif winner == -1:
                     winO += countO
                 break
 
+    # Collect statistics of winning moves of both players
     win = winX + winO
+
+    # Normalize to obtain probabilities
     win_normalized = preprocessing.normalize(win, norm='l2')
+
+    # Write probabilities to file
     f = open('probabilities', 'w')
     np.savetxt(f, win_normalized)
     print "Learning finished!"
@@ -87,11 +101,16 @@ def learn_probabilities():
 
 def get_probabilistic_move(board):
     try:
+        # Obtain probabilities from file
         prob_matrix = np.loadtxt("probabilities")
     except IOError:
+
+        # Learn, if there is no file with probabilities
         prob_matrix = learn_probabilities()
 
     prob = np.zeros((3, 3))
+
+    # Choose valid move which has highest probability
     for i in range(3):
         for j in range(3):
             if board.state[i, j] == 0:
