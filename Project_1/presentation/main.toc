@@ -1,7 +1,0 @@
-\beamer@endinputifotherversion {3.36pt}
-\beamer@sectionintoc {1}{Simple strategies for tic tac toe}{3}{0}{1}
-\beamer@subsectionintoc {1}{1}{Probabilistic strategy}{3}{0}{1}
-\beamer@subsectionintoc {1}{2}{Heuristic strategy}{7}{0}{1}
-\beamer@sectionintoc {2}{Connect 4}{15}{0}{2}
-\beamer@subsectionintoc {2}{1}{Random Play}{15}{0}{2}
-\beamer@subsectionintoc {2}{2}{Statistical Approach}{18}{0}{2}

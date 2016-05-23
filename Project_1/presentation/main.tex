@@ -10,7 +10,7 @@
 % modify this file as you see fit and even to delete this copyright
 % notice. 
 
-\documentclass[aspectratio=169]{beamer}
+\documentclass{beamer}
 \usepackage{graphicx}
 \usepackage{listings}
  
@@ -235,11 +235,11 @@ Find out, which positions \textit{usually} (over the huge number of games) contr
 	 \begin{columns}
 	 	\begin{column}{0.5\textwidth}
 	 		\centering
-	 		\includegraphics[scale =0.35]{probVSrandom.png}
+	 		\includegraphics[scale =0.30]{probVSrandom.png}
 	 	\end{column}
 	 	\begin{column}{0.5\textwidth}
 	 		\centering
-	 		\includegraphics[scale =0.35]{randVSprob.png}
+	 		\includegraphics[scale =0.30]{randVSprob.png}
 	 	\end{column}
 	 \end{columns}
 	
@@ -281,12 +281,12 @@ not a terminal state
 \begin{frame}{Heuristic / Evaluation function (cont.)}
 
 \begin{block}{A Better Evaluation Function   (Russell \& Norvig, Artificial Intelligence)}
-Eval(n) = 3 * X2 + X1 – (3 * O2 + O1) \\
+\textbf{Eval(n, X)} = 3 * X2 + X1 - (3 * O2 + O1) \\
 
 \begin{itemize}
- \item X2 is the number of lines with 2 X’s and a blank
+ \item X2 is the number of lines with 2 X's and a blank
  \item X1 is the number of lines with 1 X and 2 blanks
- \item O2 is the number of lines with 2 O’s and a blank
+ \item O2 is the number of lines with 2 O's and a blank
  \item O1 is the number of lines with 1 O and 2 blanks 
 \end{itemize}
 
@@ -309,11 +309,11 @@ Eval(n) = 3 * X2 + X1 – (3 * O2 + O1) \\
 	 \begin{columns}
 	 	\begin{column}{0.5\textwidth}
 	 		\centering
-	 		\includegraphics[scale =0.35]{minmax_random.png}
+	 		\includegraphics[scale =0.30]{minmax_random.png}
 	 	\end{column}
 	 	\begin{column}{0.5\textwidth}
 	 		\centering
-	 		\includegraphics[scale =0.35]{minmax_minmax.png}
+	 		\includegraphics[scale =0.30]{minmax_minmax.png}
 	 	\end{column}
 	 \end{columns}
 \end{frame}
@@ -328,11 +328,11 @@ We choose randomly!
 \begin{columns}
 	 	\begin{column}{0.5\textwidth}
 			\centering
-			\includegraphics[scale = .75]{random_algo.png}
+			\includegraphics[scale = .705]{random_algo.png}
 	 	\end{column}
  		\begin{column}{0.5\textwidth}
 			\centering
-			\includegraphics[scale = 0.1]{valid.jpeg}	
+			\includegraphics[scale = 0.09]{valid.jpeg}	
 	 	\end{column}
 	 \end{columns}
 \end{frame}
@@ -368,11 +368,11 @@ We choose randomly!
     \begin{columns}
 	 	\begin{column}{0.4\textwidth}
 			
-			\includegraphics[scale = .1005]{valid.jpeg}
+			\includegraphics[scale = 0.08]{valid.jpeg}
 	 	\end{column}
  		\begin{column}{0.5\textwidth}
 			
-			\includegraphics[scale = 0.45]{table.png}	
+			\includegraphics[scale = 0.40]{table.png}	
 	 	\end{column}
 	 \end{columns}
 \end{frame}
@@ -391,12 +391,12 @@ We choose randomly!
 	 	\begin{column}{0.5\textwidth}
 	 	Statistics Approach VS Random
 			\centering
-			\includegraphics[scale = .35]{statVsrand.png}
+			\includegraphics[scale = .30]{statVsrand.png}
 	 	\end{column}
  		\begin{column}{0.5\textwidth}
  		Statistical Approach VS Statistical Approach
 			\centering
-			\includegraphics[scale = 0.35]{statVsstat.png}	
+			\includegraphics[scale = 0.30]{statVsstat.png}	
 	 	\end{column}
 	 \end{columns}
 \end{frame}
@@ -404,11 +404,6 @@ We choose randomly!
 
 % Placing a * after \section means it will not show in the
 % outline or table of contents.
-\section*{Summary}
-
-\begin{frame}{Do we need Summary ?}
-	
-\end{frame}
 
 \begin{frame}{That's All Folks!}
 	\begin{center}
