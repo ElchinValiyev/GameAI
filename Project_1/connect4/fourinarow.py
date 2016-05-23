@@ -278,7 +278,6 @@ def animateComputerMoving(board, column, player):
     # moving the black tile up
     while y > (YMARGIN - SPACESIZE):
         y -= int(speed)
-        # speed += 0.5
         drawBoard(board, {'x': x, 'y': y, 'color': color})
         pygame.display.update()
         FPSCLOCK.tick()
@@ -287,7 +286,6 @@ def animateComputerMoving(board, column, player):
     speed = INIT_SPEED
     while x * player < player * (XMARGIN + column * SPACESIZE):
         x += player * int(speed)
-        # speed += 0.5
         drawBoard(board, {'x': x, 'y': y, 'color': color})
         pygame.display.update()
         FPSCLOCK.tick()
