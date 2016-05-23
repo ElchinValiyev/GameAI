@@ -9,7 +9,7 @@ BOARDWIDTH = 7  # how many spaces wide the board is
 BOARDHEIGHT = 6  # how many spaces tall the board is
 assert BOARDWIDTH >= 4 and BOARDHEIGHT >= 4, 'Board must be at least 4x4.'
 
-INIT_SPEED = 15  # Speed with which User tokens move
+INIT_SPEED = 4  # Speed with which User tokens move
 SPACESIZE = 50  # size of the tokens and individual board spaces in pixels
 
 FPS = 60  # frames per second to update the screen
@@ -499,5 +499,5 @@ def gather_stats(agent_1, agent_2, game_choice):
 
 if __name__ == '__main__':
     # learn_from_random_play(10000)
-    generate_statistics(getComputerMove, getComputerMove, 10000)
-    # play_with_ui(getComputerMove, getComputerMove)
+    # generate_statistics(getComputerMove, getComputerMove, 10000)
+    play_with_ui(getComputerMove, getComputerMove)
