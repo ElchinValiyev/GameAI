@@ -22,13 +22,21 @@ A good to very good solution requires additional efforts especially w.r.t. to el
 draw.io
 plot.ly
 
-###Project 1
+####Submission
+Send all your solutions (code, resulting images, slides) in a ZIP archive
+to `bauckhag@bit.uni-bonn.de`
 
+###Project 1
 Simple strategies for turn-based games.
 
 #####Solution(s) due:
 
 May 23, 2016 at 12:00
 
-Send all your solutions (code, resulting images, slides) in a ZIP archive
-to `bauckhag@bit.uni-bonn.de`
+
+###Project 2
+Game trees and path planning.
+
+#####Solution(s) due:
+June 20, 2016 at 12:00
+
