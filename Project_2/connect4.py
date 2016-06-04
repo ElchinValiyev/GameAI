@@ -7,6 +7,15 @@ BOARDHEIGHT = 6
 EMPTY = 0
 
 
+def make_autopct(values):
+    def my_autopct(pct):
+        if pct == 0:
+            return ""
+        else:
+            return '{p:.1f}% '.format(p=pct)
+    return my_autopct
+
+
 def plotResults(red_wins, black_wins, tie):
     # Setting up plot variables
     labels = ['Red Wins', 'Black Wins', 'Ties']
@@ -14,7 +23,7 @@ def plotResults(red_wins, black_wins, tie):
     colors = ['yellowgreen', 'gold', 'lightskyblue']
     explode = (0.1, 0, 0)
 
-    plt.pie(sizes, colors=colors, explode=explode, labels=labels, shadow=True,
+    plt.pie(sizes, colors=colors, autopct=make_autopct(sizes), explode=explode, labels=labels, shadow=True,
             startangle=70)
     plt.axis('equal')
     plt.tight_layout()
