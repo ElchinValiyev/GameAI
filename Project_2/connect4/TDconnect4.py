@@ -21,11 +21,11 @@ class TD:
     def create_model(self):
         model = Sequential()
         model.add(Dense(84, init='uniform', input_shape=(126,)))
-        model.add(Activation('tanh'))
+        model.add(Activation('relu'))
         # model.add(Dropout(0.2)) I'm not using dropout, but maybe you wanna give it a try?
 
         model.add(Dense(42, init='uniform'))
-        model.add(Activation('tanh'))
+        model.add(Activation('relu'))
         # model.add(Dropout(0.2))
 
         model.add(Dense(1, init='uniform'))
@@ -57,7 +57,7 @@ class TD:
             if c4.isWinner(state, player):
                 return player
             player *= -1
-        return 0  # draw
+        return 0.5  # draw
 
     def action(self, state, player=1):
         if random.random() < self.epsilon:
@@ -101,7 +101,7 @@ class TD:
 if __name__ == "__main__":
 
     player = TD()
-    player.train(500000)
+    player.train(250000)
     winners = [0, 0, 0]
     print "Testing"
     for i in range(1000):

@@ -15,16 +15,16 @@ def build_tree():
     # init_board.make_move((2, 2))
     # init_board.make_move((0, 1))
 
-    # unique_gamestates = set()  # unique boards
-    # unique_gamestates.add(str(init_board.state))
-    # unique_draw = set()
+    unique_gamestates = set()  # unique boards
+    unique_gamestates.add(str(init_board.state))
+    unique_draw = set()
 
     def traverse(board):
         xs, ys = board.get_moves()
         if xs.size == 0:  # no moves possible
             nodes[0] += 1
             leaf_nodes[0] += 1
-            # unique_draw.add(str(board.state))
+            unique_draw.add(str(board.state))
             winners[0] += 1  # record the draw
             return
         else:
@@ -33,7 +33,7 @@ def build_tree():
                 new_board = board.copy()
                 new_board.make_move((xs[i], ys[i]))
                 nodes[0] += 1
-                # unique_gamestates.add(str(new_board.state))
+                unique_gamestates.add(str(new_board.state))
                 # If was winning move record winner
                 # No need to go down that branch
                 if new_board.game_is_over():
@@ -48,8 +48,8 @@ def build_tree():
     print  winners
     print leaf_nodes
     print nodes
-    # print  len(unique_gamestates)
-    # print len(unique_draw)
+    print  len(unique_gamestates)
+    print len(unique_draw)
 
 
 tree = build_tree()
