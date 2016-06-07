@@ -135,7 +135,7 @@ def getReward(board, player):
 
 
 def getNeuralInput(state):
-    new_state = state.reshape(1, 42)
+    new_state = state.reshape(1, BOARDHEIGHT*BOARDWIDTH)
     x = np.append((new_state == 0).astype(int), (new_state == 1).astype(int))
     x = np.append(x, (new_state == -1).astype(int))
     return x
