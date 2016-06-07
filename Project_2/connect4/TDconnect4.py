@@ -1,8 +1,3 @@
-# Uncomment these 3 lines if you want to use GPU
-# import theano
-# theano.config.device = 'gpu'
-# theano.config.floatX = 'float32'
-
 import random
 import connect4 as c4
 import numpy as np
@@ -106,7 +101,7 @@ class TD:
 if __name__ == "__main__":
 
     player = TD()
-    player.train(50000)
+    player.train(500000)
     winners = [0, 0, 0]
     print "Testing"
     for i in range(1000):

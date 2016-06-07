@@ -10,7 +10,7 @@ epsilon, a random move (exploratory); by default epsilon=0.3. The agent updates 
 """
 
 import random
-import connect4 as c4
+import Project_2.connect4 as c4
 import pickle
 
 EMPTY = 0
