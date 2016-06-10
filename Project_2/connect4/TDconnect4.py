@@ -14,11 +14,13 @@ class TD:
         try:
             self.load_network()
         except IOError:
+            print 'Failed to load...'
             self.create_model()
         self.epsilon = 0.5
         self.previous_state = None
 
     def create_model(self):
+        print 'Creating model...'
         model = Sequential()
         model.add(Dense(84, init='uniform', input_shape=(126,)))
         model.add(Activation('relu'))
@@ -34,25 +36,30 @@ class TD:
         rms = RMSprop()
         model.compile(loss='mse', optimizer=rms)
         self.net = model
+        print 'Done!'
 
     def train(self, epochs):
+        trainer = TD()
         for i in range(epochs):
+            print 'Game: {0}'.format(i)
             if i % 10000 == 0:
-                print 'Game: {0}'.format(i)
                 self.save_network()
-            winner = self.play()
-            self.backup(winner)
+            winner = self.play(trainer)
+            self.backup(np.array([winner]))
+            trainer.backup(np.array([-winner]))
+            trainer.previous_state = None
+            self.previous_state = None
         self.save_network()
         print "Training finished!"
 
-    def play(self):
+    def play(self, trainer):
         state = c4.getNewBoard()
         player = 1
         while not c4.isBoardFull(state):
             if player == 1:
-                move = self.action(state, player)
+                move = self.action(state)
             else:
-                move = c4.getRandomMove(state)
+                move = trainer.action(state)
             state = c4.makeMove(state, player, move)
             if c4.isWinner(state, player):
                 return player
@@ -69,21 +76,23 @@ class TD:
         return move
 
     def greedy(self, state, player=1):
-        compare_value = float("-inf")
+        max_value = float("-inf")
         next_move = None
         # TODO: implemen get_possible_moves in c4
-        for i in range(7):
-            if c4.isValidMove(state, i):
-                new_state = c4.makeMove(state, player, i)
+        for move in range(7):
+            if c4.isValidMove(state, move):
+                new_state = c4.makeMove(state, player, move)
                 val = self.net.predict(c4.getNeuralInput(new_state).reshape(1, 126), batch_size=1)
-                if val > compare_value:
-                    compare_value = val
-                    next_move = i
+                if val > max_value:
+                    max_value = val
+                    next_move = move
+        self.backup(max_value)
         return next_move
 
     def backup(self, value):
-        self.net.fit(c4.getNeuralInput(self.previous_state).reshape(1, 126), np.array([value]), batch_size=1,
-                     nb_epoch=1)
+        if self.previous_state is not None:
+            self.net.fit(c4.getNeuralInput(self.previous_state).reshape(1, 126), value, batch_size=1,
+                         nb_epoch=1)
 
     def save_network(self):
         json_string = self.net.to_json()
@@ -91,20 +100,22 @@ class TD:
         self.net.save_weights('network_weights.h5', overwrite=True)
 
     def load_network(self):
+        print 'Loading network...'
         model = model_from_json(open('model.json').read())
         model.load_weights('network_weights.h5')
         rms = RMSprop()
         model.compile(loss='mse', optimizer=rms)
+        print 'Network loaded!'
         self.net = model
 
 
 if __name__ == "__main__":
 
     player = TD()
-    player.train(250000)
+    player.train(300000)
     winners = [0, 0, 0]
     print "Testing"
-    for i in range(1000):
+    for i in range(10000):
         winners[c4.play_without_ui(player.greedy, c4.getRandomMove)] += 1
     c4.plotResults(winners[1], winners[2], winners[0])
     print winners

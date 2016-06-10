@@ -10,7 +10,7 @@ epsilon, a random move (exploratory); by default epsilon=0.3. The agent updates 
 """
 
 import random
-import Project_2.connect4 as c4
+import connect4 as c4
 import pickle
 
 EMPTY = 0
@@ -145,7 +145,6 @@ class Agent(object):
 
 if __name__ == "__main__":
     p1 = Agent(1, lossval=-1)
-    p1.learning = False
     winners = [0, 0, 0]
     for i in range(10000):
         winners[c4.play_without_ui(p1.greedy, c4.getRandomMove)] += 1
