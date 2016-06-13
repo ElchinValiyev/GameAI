@@ -62,16 +62,20 @@ class Paddle:  # class for paddle vars
 
 
 class Ball:  # class for ball vars
-    x = 0
-    y = 0
-    remaining = 3
-    xPos = 1  # amount increasing by for x. adjusted for speed
-    yPos = 1
-    adjusted = False  # says wether the xPos and yPos have been adjusted for speed
-    speed = 5
-    collisions = 0
-    alive = False
-    moving = False
+    def __init__(self):
+        self.x = 0
+        self.y = 0
+        self.remaining = 3
+        self.xPos = 1  # amount increasing by for x. adjusted for speed
+        self.yPos = 1
+        self.adjusted = False  # says wether the xPos and yPos have been adjusted for speed
+        self.speed = 5
+        self.collisions = 0
+        self.alive = False
+        self.moving = False
+
+    def rect(self):
+        return pygame.Rect(self.x - 3, self.y - 3, 6, 6)
 
     def adjust(self):  # adjusts the x and y being added to the ball to make the hypotenuse the ball speed
         tSlope = math.sqrt(self.xPos ** 2 + self.yPos ** 2)
@@ -157,9 +161,9 @@ def game(score, paddle, ball, board, wall1):  # The game itself
                         ball.speed += 1
 
             # check wall collide----------------------------
-            if wall1.collidepoint(ball.x, ball.y) == True or wall2.collidepoint(ball.x, ball.y):
+            if wall1.colliderect(ball.rect()) == True or wall2.colliderect(ball.rect()):
                 ball.xPos = -(ball.xPos)
-            if wall3.collidepoint(ball.x, ball.y) == True:
+            if wall3.colliderect(ball.rect()) == True:
                 ball.yPos = -(ball.yPos)
 
             # check collision with bricks-------------------
@@ -190,10 +194,12 @@ def game(score, paddle, ball, board, wall1):  # The game itself
                 if Break:
                     break
             if ball.y > 460:
+                print  paddle.x
+                print ball.x
                 ball.alive = False
 
         # check if ball was lost
-        if ball.alive == False:
+        if not ball.alive:
             running = False
             ball.remaining -= 1
 
@@ -234,16 +240,18 @@ def agent_move(ball, paddle):
         if fall_point > 590:
             fall_point = 590 - (fall_point % 590)
         if fall_point < 50:
-            fall_point = 0
+            fall_point = math.fabs(50 - fall_point) + 50
 
     else:
         fall_point = ball.x
         # fall_point = 320
 
-    if fall_point > paddle.x:
+    if fall_point > paddle.x + 8:
         paddle.direction = 'right'
-    else:
+    elif fall_point < paddle.x - 8:
         paddle.direction = 'left'
+    else:
+        paddle.direction = 'none'
 
 
 # -----------------------------------------------------
