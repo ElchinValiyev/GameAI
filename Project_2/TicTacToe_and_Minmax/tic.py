@@ -5,26 +5,15 @@ import numpy as np
 def build_tree():
     branch_number = []  # for branching factor calculation
     winners = [0, 0, 0]  # draw,x,o
-    leaf_nodes = [0]
-    nodes = [1]
+    nodes = [1]  # counter of tree nodes
     init_board = Board()
-
-    # init_board.make_move((0, 0))
-    # init_board.make_move((2, 1))
-    # init_board.make_move((1, 1))
-    # init_board.make_move((2, 2))
-    # init_board.make_move((0, 1))
 
     unique_gamestates = set()  # unique boards
     unique_gamestates.add(str(init_board.state))
-    unique_draw = set()
 
     def traverse(board):
         xs, ys = board.get_moves()
         if xs.size == 0:  # no moves possible
-            nodes[0] += 1
-            leaf_nodes[0] += 1
-            unique_draw.add(str(board.state))
             winners[0] += 1  # record the draw
             return
         else:
@@ -37,20 +26,18 @@ def build_tree():
                 # If was winning move record winner
                 # No need to go down that branch
                 if new_board.game_is_over():
-                    leaf_nodes[0] += 1
                     winners[new_board.player] += 1
                 else:
                     traverse(new_board)
 
     traverse(init_board)
 
-    print  np.mean([n for n in branch_number if n != 1])
-    print  winners
-    print leaf_nodes
-    print nodes
-    print  len(unique_gamestates)
-    print len(unique_draw)
+    print "Branching factor: " + str(np.mean([n for n in branch_number if n != 1]))
+    print "X wins: " + str(winners[1]) + "  O wins: " + str(winners[-1]) + "  Draws: " + str(winners[0])
+    print "Leaf nodes: " + str(np.sum(winners))
+    print "Number of nodes in game: " + str(nodes[0])
+    print "Unique gamestates: " + str(len(unique_gamestates))
 
 
-tree = build_tree()
-print tree
+if __name__ == '__main__':
+    build_tree()

@@ -12,7 +12,7 @@ def make_autopct(values):
         if pct == 0:
             return ""
         else:
-            return '{p:.1f}% '.format(p=pct)
+            return '{p:.2f}% '.format(p=pct)
     return my_autopct
 
 
