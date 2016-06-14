@@ -11,6 +11,7 @@ from keras.models import model_from_json
 class TD:
     def __init__(self):
         self.net = None
+        self.learning = True
         try:
             self.load_network()
         except IOError:
@@ -39,27 +40,24 @@ class TD:
         print 'Done!'
 
     def train(self, epochs):
-        trainer = TD()
-        for i in range(epochs):
-            print 'Game: {0}'.format(i)
+        for i in xrange(epochs):
             if i % 10000 == 0:
-                self.save_network()
-            winner = self.play(trainer)
+                print 'Game: {0}'.format(i)
+                # self.save_network()
+            winner = self.play()
             self.backup(np.array([winner]))
-            trainer.backup(np.array([-winner]))
-            trainer.previous_state = None
             self.previous_state = None
-        self.save_network()
+        # self.save_network()
         print "Training finished!"
 
-    def play(self, trainer):
+    def play(self):
         state = c4.getNewBoard()
         player = 1
         while not c4.isBoardFull(state):
             if player == 1:
-                move = self.action(state)
+                move = self.action(state, player)
             else:
-                move = trainer.action(state)
+                move = c4.getRandomMove(state)
             state = c4.makeMove(state, player, move)
             if c4.isWinner(state, player):
                 return player
@@ -90,7 +88,7 @@ class TD:
         return next_move
 
     def backup(self, value):
-        if self.previous_state is not None:
+        if self.previous_state is not None and self.learning:
             self.net.fit(c4.getNeuralInput(self.previous_state).reshape(1, 126), value, batch_size=1,
                          nb_epoch=1)
 
@@ -110,12 +108,12 @@ class TD:
 
 
 if __name__ == "__main__":
-
+    max = 0
     player = TD()
-    player.train(300000)
+    # player.train(5000)
     winners = [0, 0, 0]
     print "Testing"
-    for i in range(10000):
+    player.learning = False
+    for i in xrange(10000):
         winners[c4.play_without_ui(player.greedy, c4.getRandomMove)] += 1
-    c4.plotResults(winners[1], winners[2], winners[0])
-    print winners
+    c4.plotResults(winners[1], winners[-1], winners[0])
