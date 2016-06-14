@@ -97,9 +97,9 @@ def get_input():
     master.wm_title("Select the type of game")
     master.minsize(width=400, height=50)
     var = StringVar(master)
-    default_choice='Random_Vs_Random' #default choice of game_type
+    default_choice='minMax_VS_Random' #default choice of game_type
     var.set(default_choice) # initial value
-    option = OptionMenu(master, var, "Random_Vs_Random", "Statistical_Vs_Random", "Statistical_Vs_Statistical")
+    option = OptionMenu(master, var, "minMax_VS_Random", "Statistical_Vs_Random", "Statistical_Vs_Statistical")
     option.pack()
 
     def ok():
@@ -154,7 +154,7 @@ def run_game(agent_1, agent_2, game_type):
     while True:  # main game loop
         if turn == HUMAN:
             # player's turn.
-            if game_type!='Random_Vs_Random':
+            if game_type!='minMax_VS_Random':
                 row, column = statistical_move(mainBoard, 1)
                 animateComputerMoving(mainBoard, column, HUMAN)
                 mainBoard[column][row] = 1 #make the move
@@ -172,7 +172,7 @@ def run_game(agent_1, agent_2, game_type):
             turn = COMPUTER  # switch to other player's turn
         else:
             # Computer's turn.
-            if game_type=='Statistical_Vs_Random' or game_type=='Random_Vs_Random':
+            if game_type=='Statistical_Vs_Random' or game_type=='minMax_VS_Random':
 
                 column  = getRandomMove(mainBoard)#agent_2(Depth,mainBoard,-1) #get the column to make next move in
                 animateComputerMoving(mainBoard, column, COMPUTER) #Animate the move
@@ -598,7 +598,7 @@ def gather_stats(agent_1, agent_2, game_choice):
     while True:  # main game loop
         if turn == HUMAN:
             # Human player's turn.
-            if game_choice!='Random_Vs_Random':
+            if game_choice!='minMax_VS_Random':
                 board, column = statistical_move(mainBoard, 1)
             else:
                 column = agent_1(Depth,mainBoard,1)
