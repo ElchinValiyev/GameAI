@@ -2,14 +2,16 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pygame
 import random
+import time
 from Tkinter import *
 from pygame.locals import *
+import copy
 
 BOARDWIDTH = 7  # how many spaces wide the board is
 BOARDHEIGHT = 6  # how many spaces tall the board is
 assert BOARDWIDTH >= 4 and BOARDHEIGHT >= 4, 'Board must be at least 4x4.'
 
-INIT_SPEED = 4  # Speed with which User tokens move
+INIT_SPEED = 10  # Speed with which User tokens move
 SPACESIZE = 50  # size of the tokens and individual board spaces in pixels
 
 FPS = 60  # frames per second to update the screen
@@ -24,6 +26,7 @@ WHITE = (255, 255, 255)
 BGCOLOR = Custom_Color
 TEXTCOLOR = WHITE
 
+Depth=3
 RED = 1
 BLACK = -1
 EMPTY = 0
@@ -94,9 +97,9 @@ def get_input():
     master.wm_title("Select the type of game")
     master.minsize(width=400, height=50)
     var = StringVar(master)
-    default_choice='Random_Vs_Random' #default choice of game_type
+    default_choice='minMax_VS_Random' #default choice of game_type
     var.set(default_choice) # initial value
-    option = OptionMenu(master, var, "Random_Vs_Random", "Statistical_Vs_Random", "Statistical_Vs_Statistical")
+    option = OptionMenu(master, var, "minMax_VS_Random", "Statistical_Vs_Random", "Statistical_Vs_Statistical")
     option.pack()
 
     def ok():
@@ -151,13 +154,15 @@ def run_game(agent_1, agent_2, game_type):
     while True:  # main game loop
         if turn == HUMAN:
             # player's turn.
-            if game_type!='Random_Vs_Random':
-                board, column = statistical_move(mainBoard, 1)
+            if game_type!='minMax_VS_Random':
+                row, column = statistical_move(mainBoard, 1)
                 animateComputerMoving(mainBoard, column, HUMAN)
+                mainBoard[column][row] = 1 #make the move
             else:
-                column = agent_1(mainBoard) #get the column to make next move in
+                column = agent_1(Depth,mainBoard,1) #get the column to make next move in
+                print type(column)
                 animateComputerMoving(mainBoard, column, HUMAN) #Animate the move
-                status, row = makeMove(mainBoard, RED, column) #make a move and return the row number and status of the playing board
+                status = makeMove(mainBoard, RED, column) #make a move and return the row number and status of the playing board
 
                 # check if the move made was the winning move
             if isWinner(mainBoard, RED):
@@ -167,14 +172,15 @@ def run_game(agent_1, agent_2, game_type):
             turn = COMPUTER  # switch to other player's turn
         else:
             # Computer's turn.
-            if game_type=='Statistical_Vs_Random' or game_type=='Random_Vs_Random':
+            if game_type=='Statistical_Vs_Random' or game_type=='minMax_VS_Random':
 
-                column = agent_2(mainBoard) #get the column to make next move in
+                column  = getRandomMove(mainBoard)#agent_2(Depth,mainBoard,-1) #get the column to make next move in
                 animateComputerMoving(mainBoard, column, COMPUTER) #Animate the move
-                status, row = makeMove(mainBoard, BLACK, column)
+                status = makeMove(mainBoard, BLACK, column)
             else:
-                board, column = statistical_move(mainBoard, -1)
+                row, column = statistical_move(mainBoard, -1)
                 animateComputerMoving(mainBoard, column, COMPUTER)
+                mainBoard[column][row] = -1 #make the move
 
             # check if the move made was the winning move
             if isWinner(mainBoard, BLACK):
@@ -208,7 +214,7 @@ def makeMove(board, player, column):
     lowest = getLowestEmptySpace(board, column)
     if lowest != -1:
         board[column][lowest] = player
-    return board, lowest
+    return board
 
 
 def drawBoard(board, extraToken=None):
@@ -293,12 +299,191 @@ def animateComputerMoving(board, column, player):
     animateDroppingToken(board, column, color)
 
 
-def getComputerMove(board):
+def getRandomMove(board):
     # pick a random column number which is Valid 
     while True:
         x = random.randint(0, 6)
         if isValidMove(board, x):
-            return x
+			return x
+def getComputerMove(depth, state, curr_player):
+    """ Returns the best move (as a column number) and the associated alpha
+        Calls search()
+    """
+    
+    # determine opponent's color
+    if curr_player == 1:
+        opp_player = -1
+    else:
+        opp_player = 1
+    
+    # enumerate all legal moves
+    legal_moves = {} # will map legal move states to their alpha values
+    for col in range(6):
+        # if column i is a legal move...
+        if isValidMove(state,col):
+            # make the move in column 'col' for curr_player
+            dupeBoard = copy.deepcopy(state)
+            temp = makeMove(dupeBoard,curr_player,col)
+            legal_moves[col] = -search(depth-1, temp, opp_player)
+    
+    best_alpha = -99999999
+    best_move = None
+    moves = legal_moves.items()
+    random.shuffle(list(moves))
+    for move, alpha in moves:
+        if alpha >= best_alpha:
+            best_alpha = alpha
+            best_move = move
+    return best_move       
+
+
+
+def search(depth, state, curr_player):
+    """ Searches the tree at depth 'depth'
+        By default, the state is the board, and curr_player is whomever 
+        called this search
+        
+        Returns the alpha value
+    """
+    
+    # enumerate all legal moves from this state
+    legal_moves = []
+    for i in range(6):
+        # if column i is a legal move...
+        if isValidMove(state,i):
+            # make the move in column i for curr_player
+            dupeBoard2 = copy.deepcopy(state)
+            temp = makeMove(dupeBoard2,curr_player,i)
+            legal_moves.append(temp)
+    
+    # if this node (state) is a terminal node or depth == 0...
+    if depth == 0 or len(legal_moves) == 0 or gameIsOver(state) or isBoardFull(state):
+        # return the heuristic value of node
+        return value(state, curr_player)
+    
+    # determine opponent's color
+    if curr_player == 1:
+        opp_player = -1
+    else:
+        opp_player = 1
+
+    alpha = -99999999
+    for child in legal_moves:
+        if child is not None:
+        	alpha = max(alpha, -search(depth-1, child, opp_player))
+        else:
+        	print("child == None (search)")
+        
+    return alpha    
+
+
+def gameIsOver(state):
+    if checkForStreak(state, 1, 4) >= 1:
+        return True
+    elif checkForStreak(state, -1, 4) >= 1:
+        return True
+    else:
+        return False
+
+def value(state, color):
+    """ Simple heuristic to evaluate board configurations
+    """
+    if color == 1:
+        o_color = -1
+    else:
+        o_color = 1
+    
+    my_fours = checkForStreak(state, color, 4)
+    my_threes = checkForStreak(state, color, 3)
+    my_twos = checkForStreak(state, color, 2)
+    opp_fours = checkForStreak(state, o_color, 4)
+    opp_threes = checkForStreak(state, o_color, 3)
+    opp_twos = checkForStreak(state, o_color, 2)
+    if opp_fours > 0:
+        return -99999999
+    # elif opp_threes>0:
+    # 	return -1000	
+    else:
+        return my_fours*99999999 + my_threes*975 +my_twos*2 -(opp_twos*5 + opp_threes *2550)
+        
+def checkForStreak(state, color, streak):
+    count = 0
+    # for each piece in the board...
+    for i in range(7):
+        for j in range(6):
+            # ...that is of the color we're looking for...
+            if state[i][j] == color:
+                # check if a vertical streak starts at (i, j)
+                count += verticalStreak(i, j, state, streak)
+                
+                # check if a horizontal four-in-a-row starts at (i, j)
+                count += horizontalStreak(i, j, state, streak)
+                
+                # check if a diagonal (either way) four-in-a-row starts at (i, j)
+                count += diagonalCheck(i, j, state, streak)
+    # return the sum of streaks of length 'streak'
+    return count
+        
+def verticalStreak(row, col, state, streak):
+    consecutiveCount = 0
+    for i in range(row, 7):
+        if state[i][col] == state[row][col]:
+            consecutiveCount += 1
+        else:
+            break
+
+    if consecutiveCount >= streak:
+        return 1
+    else:
+        return 0
+
+def horizontalStreak(row, col, state, streak):
+    consecutiveCount = 0
+    for j in range(col, 6):
+        if state[row][j] == state[row][col]:
+            consecutiveCount += 1
+        else:
+            break
+
+    if consecutiveCount >= streak:
+        return 1
+    else:
+        return 0
+
+def diagonalCheck(row, col, state, streak):
+
+    total = 0
+    # check for diagonals with positive slope
+    consecutiveCount = 0
+    j = col
+    for i in range(row, 5):
+        if j > 5:
+            break
+        elif state[i][j] == state[row][col]:
+            consecutiveCount += 1
+        else:
+            break
+        j += 1 # increment column when row is incremented
+        
+    if consecutiveCount >= streak:
+        total += 1
+
+    # check for diagonals with negative slope
+    consecutiveCount = 0
+    j = col
+    for i in range(row, -1, -1):
+        if j > 5:
+            break
+        elif state[i][j] == state[row][col]:
+            consecutiveCount += 1
+        else:
+            break
+        j += 1 # increment column when row is incremented
+
+    if consecutiveCount >= streak:
+        total += 1
+
+    return total
 
 
 def getLowestEmptySpace(board, column):
@@ -307,39 +492,6 @@ def getLowestEmptySpace(board, column):
         if board[column][y] == EMPTY:
             return y
     return -1
-
-
-def statistical_move(board, player):
-    # getting the next best move by choosing a valid row and col combination which was used the most in lookup  
-    valid_column_moves = []
-    valid_row_moves = []
-    maximum_value = 0
-    # getting all the valid column possible moves
-    for x in range(7):
-        if isValidMove(board, x):
-            valid_row_moves.append(x)
-    test = np.load("test_table.npy")
-    
-    # find all the valid moves
-    for i in range(7):
-        lowest = getLowestEmptySpace(board, i)
-        if lowest != -1:
-            valid_column_moves.append(lowest)
-        else:
-            valid_column_moves.append(-1)
-
-    # go through all the valid moves and find the one with the largest value 
-    for y in range(len(valid_column_moves)):
-        if valid_column_moves[y] != -1:
-            if maximum_value < test[y][valid_column_moves[y]]:
-                maximum_value = test[y][valid_column_moves[y]]
-                max_row = y
-                max_column = valid_column_moves[y]
-            
-    board[max_row][max_column] = player
-
-    # return the valid move with the highest value along with board state
-    return board, max_column
 
 
 def isValidMove(board, column):
@@ -361,9 +513,11 @@ def isBoardFull(board):
 
 def isWinner(board, tile): #Checks if the move was the winning move
     # check horizontal spaces
+    consecutiveCount = 0
     for x in range(BOARDWIDTH - 3):
         for y in range(BOARDHEIGHT):
             if board[x][y] == tile and board[x + 1][y] == tile and board[x + 2][y] == tile and board[x + 3][y] == tile:
+
                 return True
     # check vertical spaces
     for x in range(BOARDWIDTH):
@@ -413,25 +567,6 @@ def play_without_ui(agent_1, agent_2):
             return 0
 
 
-def build_lookup_table(player, lookup1, lookup2):
-    # add all the moves of the winning player to build a lookup table
-    for x in range(7):
-        for y in range(6):
-            if player == 1:
-                lookup[x][y] += lookup1[x][y]
-            else:
-                lookup[x][y] += lookup2[x][y]
-
-
-def learn_from_random_play(iterations):
-    # randomly plays the game and saves the lookup table 
-    # which is the number of times a field was used by the winning player
-    for i in range(iterations):
-        play_without_ui(getComputerMove, getComputerMove)
-    np.save("lookup.npy", lookup)
-
-
-#
 def generate_statistics(agent_1, agent_2, iterations):
     red_wins = 0
     black_wins = 0
@@ -439,11 +574,13 @@ def generate_statistics(agent_1, agent_2, iterations):
     game_type = get_input()
     print game_type
     for i in range(iterations):
+    	print i
         result = gather_stats(agent_1, agent_2, game_type)
         if result == 1:
             red_wins += 1
         elif result == -1:
             black_wins += 1
+            # break
         elif result == -2:
             tie += 1
     pygame.quit()
@@ -454,19 +591,18 @@ def gather_stats(agent_1, agent_2, game_choice):
     turn = HUMAN
     winner = 0
     state = 0
-    lookup1 = np.zeros((7, 6))
-    lookup2 = np.zeros((7, 6))
+
     # Set up a blank board data structure.
     mainBoard = getNewBoard()
 
     while True:  # main game loop
         if turn == HUMAN:
             # Human player's turn.
-            if game_choice!='Random_Vs_Random':
+            if game_choice!='minMax_VS_Random':
                 board, column = statistical_move(mainBoard, 1)
             else:
-                column = agent_1(mainBoard)
-                status, row = makeMove(mainBoard, RED, column)
+                column = agent_1(Depth,mainBoard,1)
+                status = makeMove(mainBoard, RED, column)
 
             if isWinner(mainBoard, RED):
                 # winnerImg = HUMANWINNERIMG
@@ -480,7 +616,7 @@ def gather_stats(agent_1, agent_2, game_choice):
                 board, column = statistical_move(mainBoard, -1)
             else:
                 column = agent_2(mainBoard)
-                status, row = makeMove(mainBoard, BLACK, column)
+                status = makeMove(mainBoard, BLACK, column)
 
             if isWinner(mainBoard, BLACK):
                 # winnerImg = COMPUTERWINNERIMG
@@ -497,5 +633,14 @@ def gather_stats(agent_1, agent_2, game_choice):
 
 if __name__ == '__main__':
     # learn_from_random_play(10000)
-    # generate_statistics(getComputerMove, getComputerMove, 10000)
-    play_with_ui(getComputerMove, getComputerMove)
+    generate_statistics(getComputerMove, getRandomMove,500)
+    # play_with_ui(getComputerMove, getComputerMove)
+    # valid_column_moves = []
+    # board = getNewBoard()
+    # for i in range(7):
+    # 	lowest = getLowestEmptySpace(board, i)
+    # 	if lowest != -1:
+    #     	valid_column_moves.append(lowest)
+    # 	else:
+    #     	valid_column_moves.append(-1)
+    # print valid_column_moves    	
