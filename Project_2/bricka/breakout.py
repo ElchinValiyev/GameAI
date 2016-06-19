@@ -130,7 +130,7 @@ def game(score, paddle, ball, board, wall1):  # The game itself
     ball.yPos = 1
     ball.adjusted = False
 
-    while running == True:
+    while running:
         # Draw all the things------------------------------
         screen.fill(black)
         pygame.draw.rect(screen, grey, wall1)
@@ -147,7 +147,7 @@ def game(score, paddle, ball, board, wall1):  # The game itself
                 temp += 15
 
         # check all the collisions-------------------------
-        if ball.moving == True:
+        if ball.moving:
             if ball.adjusted == False:
                 ball.adjust()
             ball.x += ball.xPos
@@ -161,9 +161,9 @@ def game(score, paddle, ball, board, wall1):  # The game itself
                         ball.speed += 1
 
             # check wall collide----------------------------
-            if wall1.colliderect(ball.rect()) == True or wall2.colliderect(ball.rect()):
+            if wall1.colliderect(ball.rect()) or wall2.colliderect(ball.rect()):
                 ball.xPos = -(ball.xPos)
-            if wall3.colliderect(ball.rect()) == True:
+            if wall3.colliderect(ball.rect()):
                 ball.yPos = -(ball.yPos)
 
             # check collision with bricks-------------------

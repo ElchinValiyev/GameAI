@@ -67,7 +67,7 @@ class Agent(object):
                 self.values = pickle.load(handle)
             print "Finished loading!"
         except IOError:
-            self.train(100000)
+            print "Couldn't load"
 
     def episode_over(self, winner):
         self.backup(self.winnerval(winner))
@@ -89,7 +89,7 @@ class Agent(object):
         return c4.getRandomMove(state)
 
     def greedy(self, state):
-        maxval = -50000
+        maxval = float('-inf')
         maxmove = None
         for i in range(7):
             if c4.isValidMove(state, i):
@@ -108,10 +108,10 @@ class Agent(object):
     def lookup(self, state):
         key = self.state_string(state)
         if not key in self.values:
-            self.add(state)
+            self.add_key(state)
         return self.values[key]
 
-    def add(self, state):
+    def add_key(self, state):
         winner = game_over(state)
         tup = self.state_string(state)
         self.values[tup] = self.winnerval(winner)
@@ -133,7 +133,7 @@ class Agent(object):
         p2 = Agent(2, lossval=-1)
         p2.values = {}
         print "Training started!"
-        for i in range(times):
+        for i in xrange(times):
             if i % 1000 == 0:
                 print 'Game: {0}'.format(i)
             winner = play(self, p2)
@@ -145,8 +145,9 @@ class Agent(object):
 
 if __name__ == "__main__":
     p1 = Agent(1, lossval=-1)
+    p1.train(40000)
     winners = [0, 0, 0]
-    for i in range(10000):
+    for i in xrange(10000):
         winners[c4.play_without_ui(p1.greedy, c4.getRandomMove)] += 1
     c4.plotResults(winners[1], winners[2], winners[0])
     print winners

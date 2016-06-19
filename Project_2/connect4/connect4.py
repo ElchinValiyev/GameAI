@@ -13,6 +13,7 @@ def make_autopct(values):
             return ""
         else:
             return '{p:.2f}% '.format(p=pct)
+
     return my_autopct
 
 
@@ -126,16 +127,8 @@ def play_without_ui(agent_1, agent_2):
             return 0
 
 
-def getReward(board, player):
-    if isWinner(board, player):
-        return 10 * player
-    if isBoardFull(board):
-        return 5
-    return -1
-
-
 def getNeuralInput(state):
-    new_state = state.reshape(1, BOARDHEIGHT*BOARDWIDTH)
+    new_state = state.reshape(1, BOARDHEIGHT * BOARDWIDTH)
     x = np.append((new_state == 0).astype(int), (new_state == 1).astype(int))
     x = np.append(x, (new_state == -1).astype(int))
     return x
