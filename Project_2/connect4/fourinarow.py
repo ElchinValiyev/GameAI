@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 import pygame,numpy as np,time
 from pygame.locals import *
 import random
+import pyprind
 
 BOARDWIDTH = 7  # how many spaces wide the board is
 BOARDHEIGHT = 6  # how many spaces tall the board is
@@ -21,7 +22,7 @@ WHITE = (255, 255, 255)
 BGCOLOR = Custom_Color
 TEXTCOLOR = WHITE
 
-Depth=2
+# Depth=2
 RED = 1
 BLACK = -1
 EMPTY = 0
@@ -61,7 +62,7 @@ def play_with_ui(agent_1, agent_2):
 	ARROWRECT = ARROWIMG.get_rect()
 	ARROWRECT.left = REDPILERECT.right + 10
 	ARROWRECT.centery = REDPILERECT.centery
-	game_choice = get_input()
+	depth = get_input()
 
 	# Initializing the game parameters 
 	red_wins = 0
@@ -70,7 +71,7 @@ def play_with_ui(agent_1, agent_2):
 
 	#  Game Loop
 	while True:
-		result, state = run_game(agent_1, agent_2, game_choice)
+		result, state = run_game(agent_1, agent_2,int(depth))
 		if result == 1:
 			red_wins += 1
 		elif result == -1:
@@ -86,12 +87,12 @@ def play_with_ui(agent_1, agent_2):
 def get_input():
 	# Input dialog box prompting game type seletion
 	master = Tk()
-	master.wm_title("Select the type of game")
+	master.wm_title("Select the depth for minimax")
 	master.minsize(width=400, height=50)
 	var = StringVar(master)
-	default_choice='minMax_VS_Random' #default choice of game_type
+	default_choice='1' #default choice of game_type
 	var.set(default_choice) # initial value
-	option = OptionMenu(master, var, "minMax_VS_Random")
+	option = OptionMenu(master, var, "1","2","3")
 	option.pack()
 
 	def ok():
@@ -133,9 +134,10 @@ def plotResults(red_wins, black_wins, tie):
 	print "number of red wins ", red_wins
 	print "number of black wins ", black_wins
 	print "number of ties ", tie
+	print "Depth ",depth
 
 
-def run_game(agent_1, agent_2, game_type):
+def run_game(agent_1, agent_2,depth):
 	# Maing Game logic
 	turn = HUMAN
 	winner = 0 # winner = 1 means player winner = -1 computer.winner = -2 is for tie
@@ -146,20 +148,11 @@ def run_game(agent_1, agent_2, game_type):
 	while True:  # main game loop
 		if turn == HUMAN:
 			# player's turn.
-			if game_type!='minMax_VS_Random':
-				row, column = statistical_move(mainBoard, 1)
-				animateComputerMoving(mainBoard, column, HUMAN)
-				mainBoard[column][row] = 1 #make the move
-			else:
-				column,bestValue=minimax(mainBoard,Depth,True,0,1)
-				 #get the column to make next move in
-				print "value is ",column
-				# time.sleep(2)
-				# print type(column)
-				animateComputerMoving(mainBoard, column, HUMAN) #Animate the move
-				status = makeMove(mainBoard, RED, column) #make a move and return the row number and status of the playing board
+			column,bestValue=minimax(mainBoard,depth,True,0,1)#get the column to make next move in
+			animateComputerMoving(mainBoard, column, HUMAN) #Animate the move
+			status = makeMove(mainBoard, RED, column) #make a move and return the row number and status of the playing board
 
-				# check if the move made was the winning move
+			# check if the move made was the winning move
 			if isWinner(mainBoard, RED):
 				winnerImg = HUMANWINNERIMG #In case of player Set the image showing game result to player win
 				winner = 1
@@ -167,15 +160,10 @@ def run_game(agent_1, agent_2, game_type):
 			turn = COMPUTER  # switch to other player's turn
 		else:
 			# Computer's turn.
-			if game_type=='Statistical_Vs_Random' or game_type=='minMax_VS_Random':
 
-				column  = getRandomMove(mainBoard)#agent_2(Depth,mainBoard,-1) #get the column to make next move in
-				animateComputerMoving(mainBoard, column, COMPUTER) #Animate the move
-				status = makeMove(mainBoard, BLACK, column)
-			else:
-				row, column = statistical_move(mainBoard, -1)
-				animateComputerMoving(mainBoard, column, COMPUTER)
-				mainBoard[column][row] = -1 #make the move
+			column  = getRandomMove(mainBoard)#agent_2(Depth,mainBoard,-1) #get the column to make next move in
+			animateComputerMoving(mainBoard, column, COMPUTER) #Animate the move
+			status = makeMove(mainBoard, BLACK, column)
 
 			# check if the move made was the winning move
 			if isWinner(mainBoard, BLACK):
@@ -258,7 +246,6 @@ def minimax(node, depth, maximizingPlayer,column,player1):
 
 def evaluate(player1,node,column):
 	#Simple heuristic for evaluation
-    # time.sleep(1)
     opp_player=player1*-1
     my_threes = checkForOpenStreak(node,player1, 3)
     my_twos = checkForOpenStreak(node,player1, 2)
@@ -510,11 +497,11 @@ def generate_statistics(agent_1, agent_2, iterations):
 	red_wins = 0
 	black_wins = 0
 	tie = 0
-	game_type = get_input()
-	print game_type
+	depth = get_input()
+	my_perc = pyprind.ProgPercent(iterations, stream=2)
 	for i in range(iterations):
-		print i
-		result = gather_stats(agent_1, agent_2, game_type)
+		my_perc.update()
+		result = gather_stats(agent_1, agent_2, int(depth))
 		if result == 1:
 			red_wins += 1
 		elif result == -1:
@@ -526,7 +513,7 @@ def generate_statistics(agent_1, agent_2, iterations):
 	plotResults(red_wins, black_wins, tie)
 
 
-def gather_stats(agent_1, agent_2, game_choice):
+def gather_stats(agent_1, agent_2, depth):
 	turn = HUMAN
 	winner = 0
 	state = 0
@@ -538,7 +525,7 @@ def gather_stats(agent_1, agent_2, game_choice):
 		if turn == HUMAN:
 			# Human player's turn.
 
-			column,bestValue = minimax(mainBoard,Depth,True,0,1)
+			column,bestValue = minimax(mainBoard,depth,True,0,1)
 			# print "column received here ", column
 			status = makeMove(mainBoard, RED, column)
 
