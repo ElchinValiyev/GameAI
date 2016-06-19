@@ -21,7 +21,7 @@ WHITE = (255, 255, 255)
 BGCOLOR = Custom_Color
 TEXTCOLOR = WHITE
 
-Depth=1
+Depth=2
 RED = 1
 BLACK = -1
 EMPTY = 0
@@ -212,16 +212,19 @@ def makeMove(board, player, column):
 		board[column][lowest] = player
 	return board
 
-def minimax(node, depth, maximizingPlayer,column,current_player):
+def minimax(node, depth, maximizingPlayer,column,player1):
 	#Check if the move was a winning move
 	if maximizingPlayer:
-	    if isWinner(node,current_player):
-	        return column,9999999
-	    elif isWinner(node,current_player*-1):
-	        return column,-9999999   
+		current_player=1
+	else:current_player=-1
+
+	if isWinner(node,player1):
+	    return column,9999999
+	elif isWinner(node,player1*-1):
+	    return column,-9999999   
 
 	if depth == 0 or isBoardFull(node):
-		return evaluate(current_player*-1,node,column)
+		return evaluate(player1,node,column)
     
 	best_move = None		
 	tupleList= []
@@ -235,7 +238,9 @@ def minimax(node, depth, maximizingPlayer,column,current_player):
 	if maximizingPlayer:
 	    bestValue = float('-inf')
 	    for i,j in tupleList:	# Make all valid moves and choose the move with highest reward
-	        current_move,current_value = minimax(j, depth - 1, False,i,current_player*-1)
+	        current_move,current_value = minimax(j, depth - 1, False,i,player1)
+	        # print "\n",np.matrix(j),"   ",current_value,"\n"
+	        # time.sleep(2)
 	        if(bestValue<current_value):
 	        	bestValue=current_value
 	        	best_move= i 	
@@ -243,23 +248,25 @@ def minimax(node, depth, maximizingPlayer,column,current_player):
 	else: #Minimizer
 	    bestValue = float('inf')
 	    for x,y in tupleList: # Make all valid moves
-	        current_move,current_value = minimax(y, depth - 1, True,x,current_player*-1)
+	        current_move,current_value = minimax(y, depth - 1, True,x,player1)
+	        # print "\n",np.matrix(y),"   ",current_value,"\n"
+	        # time.sleep(2)
 	        if(bestValue>current_value):
 	        	bestValue=current_value
 	        	best_move = x
 	return best_move,bestValue
 
-def evaluate(current_player,node,column):
+def evaluate(player1,node,column):
 	#Simple heuristic for evaluation
-
-	opp_player=current_player*-1
-	my_threes = checkForOpenStreak(node,current_player, 3)
-	my_twos = checkForOpenStreak(node,current_player, 2)
-	opp_fours = checkForOpenStreak(node,opp_player, 4)
-	opp_threes = checkForOpenStreak(node,opp_player, 3)
-	opp_twos = checkForOpenStreak(node,opp_player, 2) 
-	value=(my_threes*100 + my_twos) - (opp_threes *50)
-	return column,value
+    # time.sleep(1)
+    opp_player=player1*-1
+    my_threes = checkForOpenStreak(node,player1, 3)
+    my_twos = checkForOpenStreak(node,player1, 2)
+    opp_fours = checkForOpenStreak(node,opp_player, 4)
+    opp_threes = checkForOpenStreak(node,opp_player, 3)
+    opp_twos = checkForOpenStreak(node,opp_player, 2) 
+    value=(my_threes*100 + my_twos) - (opp_threes *50)
+    return column,value
 
 
 def drawBoard(board, extraToken=None):
@@ -384,13 +391,11 @@ def verticalStreak(row, col, state,color, streak):
 	consecutiveCount = 0
 	open_streak=False
 	for i in range(row, BOARDWIDTH):
-		if state[i][col] == color and consecutiveCount<streak:
+		if state[i][col] == color:
 			consecutiveCount += 1
 		else:
-			if consecutiveCount>=streak and state[i][col]==0:
-				open_streak=True	
 			break
-	if open_streak:
+	if consecutiveCount >= streak:
 		return 1
 	else:
 		return 0
@@ -399,13 +404,11 @@ def horizontalStreak(row, col, state,color, streak):
 	consecutiveCount = 0
 	open_streak=False
 	for j in range(col,-1,-1):
-		if state[row][j] == color and consecutiveCount<streak:
+		if state[row][j] == color:
 			consecutiveCount += 1
 		else:
-			if consecutiveCount>=streak and state[row][j]==0:
-				open_streak=True
 			break
-	if open_streak:
+	if consecutiveCount >= streak:
 		return 1
 	else:
 		return 0
@@ -421,15 +424,13 @@ def diagonalCheck(row, col, state,color, streak):
 	for i in range(row,BOARDHEIGHT):
 		if j >5:
 			break
-		elif state[i][j] == color and consecutiveCount<streak:
+		elif state[i][j] == color:
 			consecutiveCount += 1
 		else:
-			if consecutiveCount>=streak and state[i][j]==0:
-				open_streak=True
 			break
 		j += 1 # increment column when row is incremented
 
-	if open_streak:
+	if consecutiveCount >= streak:
 		total += 1
 
 
@@ -439,15 +440,13 @@ def diagonalCheck(row, col, state,color, streak):
 	for i in range(row,BOARDHEIGHT):
 		if j <0:
 			break
-		elif state[i][j] == color and consecutiveCount<streak:
+		elif state[i][j] == color:
 			consecutiveCount += 1
 		else:
-			if consecutiveCount>=streak and state[i][j]==0:
-				open_streak=True
 			break
 		j -= 1 # increment column when row is incremented
 
-	if open_streak:
+	if consecutiveCount >= streak:
 		total += 1		
 
 	return total
