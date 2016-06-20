@@ -222,7 +222,7 @@ def game(score, paddle, ball, board, wall1):  # The game itself
                         ball.moving = True
         # update display
         pygame.display.update()
-        fpsClock.tick(120)
+        fpsClock.tick(90)
     return score
 
 
