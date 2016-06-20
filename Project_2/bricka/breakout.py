@@ -194,8 +194,6 @@ def game(score, paddle, ball, board, wall1):  # The game itself
                 if Break:
                     break
             if ball.y > 460:
-                print  paddle.x
-                print ball.x
                 ball.alive = False
 
         # check if ball was lost
@@ -218,22 +216,18 @@ def game(score, paddle, ball, board, wall1):  # The game itself
             if event.type == QUIT:
                 pygame.quit()
                 sys.exit()
-            elif event.type == MOUSEMOTION:
-                mx, my = event.pos
-            elif event.type == MOUSEBUTTONUP:
-                mx, my = event.pos
             elif event.type == KEYDOWN:
                 if event.key == K_SPACE:
-                    if ball.moving == False:
+                    if not ball.moving:
                         ball.moving = True
         # update display
         pygame.display.update()
-        fpsClock.tick(30)
+        fpsClock.tick(120)
     return score
 
 
 def agent_move(ball, paddle):
-    if ball.yPos > 0:
+    if ball.yPos > 0:  # if ball goes down: calculate falling point
         dist = (paddle.y - ball.y) / ball.yPos
         fall_point = ball.x + dist * ball.xPos
 
@@ -242,9 +236,8 @@ def agent_move(ball, paddle):
         if fall_point < 50:
             fall_point = math.fabs(50 - fall_point) + 50
 
-    else:
+    else:  # if ball goes up: try to follow
         fall_point = ball.x
-        # fall_point = 320
 
     if fall_point > paddle.x + 8:
         paddle.direction = 'right'
@@ -258,19 +251,11 @@ def agent_move(ball, paddle):
 if __name__ == '__main__':
     replay = False
     loop = 0
-    try:
-        fontObj = pygame.font.Font('PressStart2P.ttf', 24)
-    except:
-        fontObj = pygame.font.Font('freesansbold.ttf', 24)
     while True:
         screen.fill(black)
-        if replay == True:
+        if replay:
             board = new_board()
             score = 0
-            try:
-                fontObj = pygame.font.Font('PressStart2P.ttf', 36)
-            except:
-                fontObj = pygame.font.Font('freesansbold.ttf', 36)
             paddle = Paddle()
             ball = Ball()
             while ball.remaining > 0:
@@ -298,10 +283,6 @@ if __name__ == '__main__':
                                         pygame.display.update()
                                         pygame.time.wait(10)
                     replay = False
-                    try:
-                        fontObj = pygame.font.Font('PressStart2P.ttf', 24)
-                    except:
-                        fontObj = pygame.font.Font('freesansbold.ttf', 24)
 
         for event in pygame.event.get():
             if event.type == QUIT:
