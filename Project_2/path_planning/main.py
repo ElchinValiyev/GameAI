@@ -15,7 +15,7 @@ if __name__ == '__main__':
         target = (2, 18)
     elif map_index == 1:
         source = (0, 1)
-        target = (4, 15)
+        target = (34, 20)
     elif map_index == 2:
         source = (3, 9)
         target = (30, 9)
