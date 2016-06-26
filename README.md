@@ -30,7 +30,6 @@ to `bauckhag@bit.uni-bonn.de`
 Simple strategies for turn-based games.
 
 #####Solution(s) due:
-
 May 23, 2016 at 12:00
 
 
@@ -38,5 +37,11 @@ May 23, 2016 at 12:00
 Game trees and path planning.
 
 #####Solution(s) due:
-June 20, 2016 at 12:00
+June 20, 2016 at 12:00.
 
+
+###Project 3
+Behavior programming.
+
+#####Solution(s) due:
+July 18, 2016 at 12:00
