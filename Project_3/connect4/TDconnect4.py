@@ -100,10 +100,10 @@ class TD:
 
 if __name__ == "__main__":
     player = TD()
-    player.train(100000)
+    #player.train(500000)
     winners = [0, 0, 0]
     print "Testing"
     player.learning = False
     for i in xrange(10000):
         winners[c4.play_without_ui(player.greedy, c4.get_random_move)] += 1
-    c4.plot_results(winners[1], winners[-1], winners[0])
+    c4.plot_results(winners[1], winners[-1], winners[0],'TD vs Random')

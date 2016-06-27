@@ -139,4 +139,4 @@ if __name__ == '__main__':
     winners = [0, 0, 0]
     for i in range(100000):
         winners[play_without_ui(get_random_move, get_random_move)] += 1
-    plot_results(winners[1], winners[-1], winners[0])
+    plot_results(winners[1], winners[-1], winners[0], 'Random vs Random')
