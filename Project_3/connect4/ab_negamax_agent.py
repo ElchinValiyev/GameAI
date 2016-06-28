@@ -1,44 +1,36 @@
 import connect4 as c4
-import sys
 
 
-def get_minmax_move(board, player=1, max_depth=2):
-    """Get the result of a minmax run and return the move"""
-    score, move = minmax(board, player, max_depth, 0, player == 1)
+def get_negamax_move(board, player=1, max_depth=2):
+    """Get the result of a ab-negamax run and return the move"""
+    score, move = alpha_beta_negamax(board, player, max_depth, 0, float('-inf'), float('inf'))
     return move
 
 
-def minmax(board, player, max_depth, current_depth, maximizing):
+def alpha_beta_negamax(board, player, max_depth, current_depth, alpha, beta):
     # Check if we're done recursing
     if c4.is_board_full(board) or current_depth == max_depth:
         return evaluate(player, board), None
 
     best_move = None
-    if player == 1:
-        best_score = -sys.maxint
-    else:
-        best_score = sys.maxint
-
+    best_score = float('-inf')
     # Go through each move
     for move in range(c4.BOARDWIDTH):
         if not c4.is_valid_move(board, move):  # skipping invalid moves
             continue
 
         new_board = c4.make_move(board, player, move)
-
         # Recurse
-        current_score, current_move = minmax(new_board, -player, max_depth, current_depth + 1, not maximizing)
+        recursed_score, current_move = alpha_beta_negamax(new_board, -player, max_depth, current_depth + 1,
+                                                          -beta, -max(alpha, best_score))
+        current_score = -recursed_score
 
         # Update the best score
-        if maximizing:  # if player's move, maximize evaluation
-            if current_score > best_score:
-                best_score = current_score
-                best_move = move
-        else:  # if opponent's move, minimize evaluation
-            if current_score < best_score:
-                best_score = current_score
-                best_move = move
-
+        if current_score > best_score:
+            best_score = current_score
+            best_move = move
+            if best_score >= beta:  # If we're outside the bounds, then prune: exit immediately
+                return best_score, best_move
     # Return the score and the best move
     return best_score, best_move
 
@@ -47,9 +39,9 @@ def evaluate(player, board):
     """Simple heuristic for evaluation"""
     opp_player = player * -1
     if c4.is_winner(board, player):
-        return sys.maxint
+        return float('inf')
     if c4.is_winner(board, player):
-        return -sys.maxint
+        return float('-inf')
 
     # Find Streaks for both players
     my_threes = check_open_streak(board, player, 3)
@@ -146,7 +138,7 @@ def diagonal_check(row, col, state, color, streak):
 if __name__ == '__main__':
     winners = [0, 0, 0]
     print "Testing"
-    for i in xrange(1000):
-        winners[c4.play_without_ui(get_minmax_move, c4.get_random_move)] += 1
+    for i in xrange(10000):
+        winners[c4.play_without_ui(get_negamax_move, c4.get_random_move)] += 1
         print 'Game: ' + str(i)
-    c4.plot_results(winners[1], winners[-1], winners[0], 'MinMax vs Random')
+    c4.plot_results(winners[1], winners[-1], winners[0], 'AB Negamax vs Random')
