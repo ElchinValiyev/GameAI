@@ -1,8 +1,7 @@
 import random
 import connect4 as c4
 import numpy as np
-import matplotlib.pyplot as plt
-from collections import deque
+
 from keras.layers.core import Dense
 from keras.models import Sequential
 from keras.models import model_from_json
@@ -11,7 +10,7 @@ from keras.models import model_from_json
 class TD:
     def __init__(self):
         self.net = None
-        self.learning = True
+        self.learning = False
         try:
             self.load_network()
         except IOError:
@@ -19,7 +18,6 @@ class TD:
             self.create_model()
         self.epsilon = 1  # initial exploration rate
         self.previous_state = None
-        self.evaluation_states = None
 
     def create_model(self):
         print 'Creating model...'
@@ -32,16 +30,11 @@ class TD:
         print 'Done!'
 
     def train(self, epochs):
-        self.prepare_evaluation_states(10)
-        plt.ion()
-        plt.title("Average V-value")
+        self.learning = True
         for k in xrange(epochs):
-
             print 'Game: {0}'.format(k)
-            if k % 1000 == 0:
-                self.plot_stats(k)
-                if k % 10000 == 0:
-                    self.save_network()
+            if k % 10000 == 0:
+                self.save_network()
             winner = self.play()  # play against opponent
             self.backup(np.array([winner]))  # give reward to the network
             self.previous_state = None
@@ -49,6 +42,7 @@ class TD:
                 self.epsilon -= (1 / epochs)
         self.save_network()
         print "Training finished!"
+        self.learning = False
 
     def play(self):
         state = c4.get_new_board()
@@ -73,7 +67,7 @@ class TD:
         self.previous_state = new_state
         return move
 
-    def greedy(self, state, player):
+    def greedy(self, state, player=1):
         max_value = float("-inf")
         next_move = None
         for move in range(c4.BOARDWIDTH):
@@ -105,37 +99,13 @@ class TD:
         print 'Network loaded!'
         self.net = model
 
-    def prepare_evaluation_states(self, quantity=5, probability=0.05):
-        game_states = deque(maxlen=quantity * 20)
-        while len(game_states) < game_states.maxlen:
-            state = c4.get_new_board()
-            player = 1
-            while not c4.is_board_full(state):
-                if random.random() < probability:
-                    game_states.append(state)
-                move = c4.get_random_move(state)  # random player is second
-                state = c4.make_move(state, player, move)
-                if c4.is_winner(state, player):
-                    break
-                player *= -1
-        self.evaluation_states = random.sample(game_states, quantity)
-
-    def plot_stats(self, iteration):
-        sum = 0
-        for state in self.evaluation_states:
-            sum += self.net.predict(c4.get_neural_input(state).reshape(1, 1083), batch_size=1)
-        sum = sum / len(self.evaluation_states)
-        plt.scatter(iteration, sum)
-        plt.pause(0.05)
-
 
 if __name__ == "__main__":
     player = TD()
-    player.train(500000)
+    # player.train(500000)
     winners = [0, 0, 0]
     print "Testing"
-    player.learning = False
-    for i in xrange(100):
-        print 'Game: ' + str(i)
+    for i in xrange(10000):
+        print 'Test game: ' + str(i)
         winners[c4.play_without_ui(player.greedy, c4.get_random_move)] += 1
     c4.plot_results(winners[1], winners[-1], winners[0], 'TD vs Random')

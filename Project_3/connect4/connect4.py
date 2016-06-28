@@ -19,8 +19,8 @@ def plot_results(red_wins, black_wins, tie, title):
     plt.title(title)
     plt.tight_layout()
     plt.show()
-    print "number of red wins ", red_wins
-    print "number of black wins ", black_wins
+    print "number of Player 1 wins ", red_wins
+    print "number of Player 2 wins ", black_wins
     print "number of ties ", tie
 
 
