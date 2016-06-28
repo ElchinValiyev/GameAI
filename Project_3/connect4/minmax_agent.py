@@ -3,7 +3,7 @@ import sys
 
 
 def get_minmax_move(board, player=1, max_depth=2):
-    # Get the result of a minmax run and return the move
+    """Get the result of a minmax run and return the move"""
     score, move = minmax(board, player, max_depth, 0, player == 1)
     return move
 
@@ -44,7 +44,7 @@ def minmax(board, player, max_depth, current_depth, maximizing):
 
 
 def evaluate(player, board):
-    # Simple heuristic for evaluation
+    """Simple heuristic for evaluation"""
     opp_player = player * -1
     if c4.is_winner(board, player):
         return sys.maxint
@@ -58,7 +58,7 @@ def evaluate(player, board):
     opp_twos = check_open_streak(board, opp_player, 2)
 
     # value to be returned
-    value = (my_threes * 1000 + my_twos * 10) - (opp_threes * 1000 + opp_twos * 10)
+    value = (my_threes * 100 + my_twos) - (opp_threes * 50 + opp_twos * 5)
     return value  # return value and the corresponding column
 
 
@@ -82,7 +82,7 @@ def check_open_streak(state, color, streak):
 
 
 def vertical_streak(row, col, state, color, streak):
-    # Check for vertical Streaks
+    """Check for vertical Streaks"""
     consecutive_count = 0
     for i in range(row, c4.BOARDWIDTH):
         if state[i][col] == color:
@@ -96,7 +96,7 @@ def vertical_streak(row, col, state, color, streak):
 
 
 def horizontal_streak(row, col, state, color, streak):
-    # Check for horizontal Streaks
+    """Checks for horizontal Streaks"""
     consecutive_count = 0
     for j in range(col, -1, -1):
         if state[row][j] == color:
@@ -110,7 +110,7 @@ def horizontal_streak(row, col, state, color, streak):
 
 
 def diagonal_check(row, col, state, color, streak):
-    # Check both positive and negative diagonals for Streaks
+    """Checks both positive and negative diagonals for Streaks"""
     total = 0
 
     # check for diagonals with negative slope
@@ -146,7 +146,7 @@ def diagonal_check(row, col, state, color, streak):
 if __name__ == '__main__':
     winners = [0, 0, 0]
     print "Testing"
-    for i in xrange(10000):
+    for i in xrange(1000):
         winners[c4.play_without_ui(get_minmax_move, c4.get_random_move)] += 1
         print 'Game: ' + str(i)
-    c4.plot_results(winners[1], winners[-1], winners[0], 'Minmax vs Random')
+    c4.plot_results(winners[1], winners[-1], winners[0], 'MinMax vs Random')
