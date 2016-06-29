@@ -50,7 +50,7 @@ def evaluate(player, board):
     opp_twos = check_open_streak(board, opp_player, 2)
 
     # value to be returned
-    value = (my_threes * 100 + my_twos) - (opp_threes * 50 + opp_twos * 5)
+    value = (my_threes * 1000 + my_twos * 100) - (opp_threes * 1000 + opp_twos * 100)
     return value  # return value and the corresponding column
 
 
