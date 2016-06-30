@@ -26,7 +26,7 @@ def alpha_beta_negamax(board, player, max_depth, current_depth, alpha, beta):
         current_score = -recursed_score
 
         # Update the best score
-        if current_score > best_score:
+        if current_score >= best_score:
             best_score = current_score
             best_move = move
             if best_score >= beta:  # If we're outside the bounds, then prune: exit immediately

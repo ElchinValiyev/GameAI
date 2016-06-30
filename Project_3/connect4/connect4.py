@@ -2,8 +2,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 import random
 
-BOARD_WIDTH = 7
-BOARD_HEIGHT = 6
+BOARD_WIDTH = 19
+BOARD_HEIGHT = 19
 
 
 def plot_results(red_wins, black_wins, tie, title):
