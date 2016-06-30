@@ -15,7 +15,7 @@ def alpha_beta_negamax(board, player, max_depth, current_depth, alpha, beta):
     best_move = None
     best_score = float('-inf')
     # Go through each move
-    for move in range(c4.BOARDWIDTH):
+    for move in range(c4.BOARD_WIDTH):
         if not c4.is_valid_move(board, move):  # skipping invalid moves
             continue
 
@@ -40,7 +40,7 @@ def evaluate(player, board):
     opp_player = player * -1
     if c4.is_winner(board, player):
         return float('inf')
-    if c4.is_winner(board, player):
+    if c4.is_winner(board, opp_player):
         return float('-inf')
 
     # Find Streaks for both players
@@ -54,30 +54,30 @@ def evaluate(player, board):
     return value  # return value and the corresponding column
 
 
-def check_open_streak(state, color, streak):
+def check_open_streak(board, player, streak):
     count = 0
     # for each piece in the board...
-    for i in xrange(c4.BOARDWIDTH):
-        for j in xrange(c4.BOARDHEIGHT):
+    for i in xrange(c4.BOARD_WIDTH):
+        for j in xrange(c4.BOARD_HEIGHT):
             # ...that is of the color we're looking for...
-            if state[i][j] == color:
+            if board[i][j] == player:
                 # check if a vertical streak starts at (i, j)
-                count += vertical_streak(i, j, state, color, streak)
+                count += vertical_streak(i, j, board, player, streak)
 
                 # check if a horizontal four-in-a-row starts at (i, j)
-                count += horizontal_streak(i, j, state, color, streak)
+                count += horizontal_streak(i, j, board, player, streak)
 
                 # check if a diagonal (either way) four-in-a-row starts at (i, j)
-                count += diagonal_check(i, j, state, color, streak)
+                count += diagonal_check(i, j, board, player, streak)
     # return the sum of streaks of length 'streak'
     return count
 
 
-def vertical_streak(row, col, state, color, streak):
+def horizontal_streak(row, col, board, player, streak):
     """Check for vertical Streaks"""
     consecutive_count = 0
-    for i in range(row, c4.BOARDWIDTH):
-        if state[i][col] == color:
+    for i in range(row, c4.BOARD_WIDTH):  # looking to the left
+        if board[i][col] == player:
             consecutive_count += 1
         else:
             break
@@ -87,11 +87,11 @@ def vertical_streak(row, col, state, color, streak):
         return 0
 
 
-def horizontal_streak(row, col, state, color, streak):
+def vertical_streak(row, col, board, player, streak):
     """Checks for horizontal Streaks"""
     consecutive_count = 0
-    for j in range(col, -1, -1):
-        if state[row][j] == color:
+    for j in range(col, c4.BOARD_HEIGHT):
+        if board[row][j] == player:
             consecutive_count += 1
         else:
             break
@@ -101,17 +101,17 @@ def horizontal_streak(row, col, state, color, streak):
         return 0
 
 
-def diagonal_check(row, col, state, color, streak):
+def diagonal_check(row, col, board, player, streak):
     """Checks both positive and negative diagonals for Streaks"""
     total = 0
 
     # check for diagonals with negative slope
     consecutive_count = 0
     j = col
-    for i in range(row, c4.BOARDHEIGHT):
-        if j > 5:
+    for i in range(row, c4.BOARD_WIDTH):
+        if j > c4.BOARD_HEIGHT - 1:
             break
-        elif state[i][j] == color:
+        elif board[i][j] == player:
             consecutive_count += 1
         else:
             break
@@ -122,10 +122,10 @@ def diagonal_check(row, col, state, color, streak):
 
     consecutive_count = 0
     j = col
-    for i in range(row, c4.BOARDHEIGHT):
+    for i in range(row, c4.BOARD_WIDTH):
         if j < 0:
             break
-        elif state[i][j] == color:
+        elif board[i][j] == player:
             consecutive_count += 1
         else:
             break

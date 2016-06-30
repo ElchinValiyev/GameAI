@@ -70,7 +70,7 @@ class TD:
     def greedy(self, state, player=1):
         max_value = float("-inf")
         next_move = None
-        for move in range(c4.BOARDWIDTH):
+        for move in range(c4.BOARD_WIDTH):
             if c4.is_valid_move(state, move):  # checking only valid moves
                 new_state = c4.make_move(state, player, move)
                 # estimate of new state

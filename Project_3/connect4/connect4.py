@@ -2,8 +2,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 import random
 
-BOARDWIDTH = 19
-BOARDHEIGHT = 19
+BOARD_WIDTH = 7
+BOARD_HEIGHT = 6
 
 
 def plot_results(red_wins, black_wins, tie, title):
@@ -36,21 +36,21 @@ def make_move(board, player, column):
 
 def get_new_board():
     """Creates a new board and initialize all fields to zero"""
-    board = np.zeros((BOARDWIDTH, BOARDHEIGHT), dtype='int')
+    board = np.zeros((BOARD_WIDTH, BOARD_HEIGHT), dtype='int')
     return board
 
 
 def get_random_move(board):
     """Picks a random column number which is Valid"""
     while True:
-        x = random.randrange(BOARDWIDTH)
+        x = random.randrange(BOARD_WIDTH)
         if is_valid_move(board, x):
             return x
 
 
 def get_lowest_empty_space(board, column):
     """Return the row number of the lowest empty row in the given column"""
-    for y in range(BOARDHEIGHT - 1, -1, -1):
+    for y in range(BOARD_HEIGHT - 1, -1, -1):
         if board[column][y] == 0:  # if cell is empty
             return y
     return -1
@@ -58,15 +58,15 @@ def get_lowest_empty_space(board, column):
 
 def is_valid_move(board, column):
     """Returns True if there is an empty space in the given column. Otherwise returns False"""
-    if column < 0 or column >= BOARDWIDTH or board[column][0] != 0:
+    if column < 0 or column >= BOARD_WIDTH or board[column][0] != 0:
         return False
     return True
 
 
 def is_board_full(board):
     """Returns True if there are no empty spaces anywhere on the board."""
-    for x in range(BOARDWIDTH):
-        for y in range(BOARDHEIGHT):
+    for x in range(BOARD_WIDTH):
+        for y in range(BOARD_HEIGHT):
             if board[x][y] == 0:  # is cell is empty
                 return False
     return True
@@ -75,26 +75,26 @@ def is_board_full(board):
 def is_winner(board, player):
     """Checks if player has won"""
     # check horizontal spaces
-    for x in range(BOARDWIDTH - 3):
-        for y in range(BOARDHEIGHT):
+    for x in range(BOARD_WIDTH - 3):
+        for y in range(BOARD_HEIGHT):
             if board[x][y] == player and board[x + 1][y] == player and board[x + 2][y] == player \
                     and board[x + 3][y] == player:
                 return True
     # check vertical spaces
-    for x in range(BOARDWIDTH):
-        for y in range(BOARDHEIGHT - 3):
+    for x in range(BOARD_WIDTH):
+        for y in range(BOARD_HEIGHT - 3):
             if board[x][y] == player and board[x][y + 1] == player and board[x][y + 2] == player \
                     and board[x][y + 3] == player:
                 return True
     # check / diagonal spaces
-    for x in range(BOARDWIDTH - 3):
-        for y in range(3, BOARDHEIGHT):
+    for x in range(BOARD_WIDTH - 3):
+        for y in range(3, BOARD_HEIGHT):
             if board[x][y] == player and board[x + 1][y - 1] == player and board[x + 2][y - 2] == player \
                     and board[x + 3][y - 3] == player:
                 return True
     # check \ diagonal spaces
-    for x in range(BOARDWIDTH - 3):
-        for y in range(BOARDHEIGHT - 3):
+    for x in range(BOARD_WIDTH - 3):
+        for y in range(BOARD_HEIGHT - 3):
             if board[x][y] == player and board[x + 1][y + 1] == player and \
                             board[x + 2][y + 2] == player and board[x + 3][y + 3] == player:
                 return True
@@ -122,7 +122,7 @@ def play_without_ui(agent_1, agent_2):
 
 
 def get_neural_input(state):
-    new_state = state.reshape(1, BOARDHEIGHT * BOARDWIDTH)
+    new_state = state.reshape(1, BOARD_HEIGHT * BOARD_WIDTH)
     x = np.append((new_state == 0).astype(int), (new_state == 1).astype(int))
     x = np.append(x, (new_state == -1).astype(int))
     return x
