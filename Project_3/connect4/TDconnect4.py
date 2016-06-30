@@ -10,7 +10,7 @@ from keras.models import model_from_json
 class TD:
     def __init__(self):
         self.net = None
-        self.learning = True
+        self.learning = False
         try:
             self.load_network()
         except IOError:
@@ -30,10 +30,11 @@ class TD:
         print 'Done!'
 
     def train(self, epochs):
+        self.learning = True
         for k in xrange(epochs):
+            print 'Game: {0}'.format(k)
             if k % 10000 == 0:
-                print 'Game: {0}'.format(k)
-                # self.save_network()
+                self.save_network()
             winner = self.play()  # play against opponent
             self.backup(np.array([winner]))  # give reward to the network
             self.previous_state = None
@@ -41,13 +42,14 @@ class TD:
                 self.epsilon -= (1 / epochs)
         self.save_network()
         print "Training finished!"
+        self.learning = False
 
     def play(self):
         state = c4.get_new_board()
         player = 1
         while not c4.is_board_full(state):
             if player == 1:  # TD player plays as first player
-                move = self.action(state, player)
+                move = self.action(state)
             else:
                 move = c4.get_random_move(state)  # random player is second
             state = c4.make_move(state, player, move)
@@ -68,7 +70,7 @@ class TD:
     def greedy(self, state, player=1):
         max_value = float("-inf")
         next_move = None
-        for move in range(c4.BOARDWIDTH):
+        for move in range(c4.BOARD_WIDTH):
             if c4.is_valid_move(state, move):  # checking only valid moves
                 new_state = c4.make_move(state, player, move)
                 # estimate of new state
@@ -100,10 +102,10 @@ class TD:
 
 if __name__ == "__main__":
     player = TD()
-    player.train(100000)
+    # player.train(500000)
     winners = [0, 0, 0]
     print "Testing"
-    player.learning = False
     for i in xrange(10000):
+        print 'Test game: ' + str(i)
         winners[c4.play_without_ui(player.greedy, c4.get_random_move)] += 1
-    c4.plot_results(winners[1], winners[-1], winners[0])
+    c4.plot_results(winners[1], winners[-1], winners[0], 'TD vs Random')
