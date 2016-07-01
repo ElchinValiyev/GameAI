@@ -100,7 +100,7 @@ class TD:
 
 if __name__ == "__main__":
     player = TD()
-    player.train(100000)
+    player.train(300000)
     winners = [0, 0, 0]
     print "Testing"
     player.learning = False

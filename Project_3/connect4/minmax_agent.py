@@ -146,7 +146,7 @@ def diagonal_check(row, col, state, color, streak):
 if __name__ == '__main__':
     winners = [0, 0, 0]
     print "Testing"
-    for i in xrange(10000):
+    for i in xrange(1000):
         winners[c4.play_without_ui(get_minmax_move, c4.get_random_move)] += 1
         print 'Game: ' + str(i)
-    c4.plot_results(winners[1], winners[-1], winners[0])
+    c4.plot_results(winners[1], winners[-1], winners[0],'MinMax vs Random')
