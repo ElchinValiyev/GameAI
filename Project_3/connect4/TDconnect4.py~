@@ -102,7 +102,11 @@ class TD:
 
 if __name__ == "__main__":
     player = TD()
+<<<<<<< HEAD
+    player.train(300000)
+=======
     # player.train(500000)
+>>>>>>> adb0cba5c24b9ac69c1cdb13c465cb55ccf38968
     winners = [0, 0, 0]
     print "Testing"
     for i in xrange(10000):
