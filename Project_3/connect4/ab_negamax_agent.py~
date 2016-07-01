@@ -138,12 +138,6 @@ def diagonal_check(row, col, board, player, streak):
 if __name__ == '__main__':
     winners = [0, 0, 0]
     print "Testing"
-<<<<<<< HEAD:Project_3/connect4/minmax_agent.py
-    for i in xrange(1000):
-        winners[c4.play_without_ui(get_minmax_move, c4.get_random_move)] += 1
-        print 'Game: ' + str(i)
-    c4.plot_results(winners[1], winners[-1], winners[0],'MinMax vs Random')
-=======
     for i in xrange(10000):
         winners[c4.play_without_ui(get_negamax_move, c4.get_random_move)] += 1
         print 'Game: ' + str(i)

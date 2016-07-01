@@ -142,4 +142,4 @@ if __name__ == '__main__':
         winners[c4.play_without_ui(get_negamax_move, c4.get_random_move)] += 1
         print 'Game: ' + str(i)
     c4.plot_results(winners[1], winners[-1], winners[0], 'AB Negamax vs Random')
->>>>>>> adb0cba5c24b9ac69c1cdb13c465cb55ccf38968:Project_3/connect4/ab_negamax_agent.py
+
