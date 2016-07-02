@@ -14,25 +14,24 @@ class TD:
         try:
             self.load_network()
         except IOError:
-            print 'Failed to load...'
+            print ('Failed to load...')
             self.create_model()
         self.epsilon = 1  # initial exploration rate
         self.previous_state = None
 
     def create_model(self):
-        print 'Creating model...'
+        print ('Creating model...')
         model = Sequential()
-        model.add(Dense(19 * 19 * 2, input_shape=(19 * 19 * 3,), activation='relu'))
-        model.add(Dense(19 * 19, activation='relu'))
+        model.add(Dense(19 * 19 * 2, input_shape=(19 * 19,), activation='relu'))
         model.add(Dense(1, activation='linear'))  # linear output so we can have range of real-valued outputs
         model.compile(loss='mse', optimizer='rmsprop')
         self.net = model
-        print 'Done!'
+        print ('Done!')
 
     def train(self, epochs):
         self.learning = True
         for k in xrange(epochs):
-            print 'Game: {0}'.format(k)
+            print ('Game: {0}'.format(k))
             if k % 10000 == 0:
                 self.save_network()
             winner = self.play()  # play against opponent
@@ -41,7 +40,7 @@ class TD:
             if self.epsilon > 0.1:  # decrement epsilon over time
                 self.epsilon -= (1 / epochs)
         self.save_network()
-        print "Training finished!"
+        print ('Training finished!')
         self.learning = False
 
     def play(self):
@@ -74,7 +73,7 @@ class TD:
             if c4.is_valid_move(state, move):  # checking only valid moves
                 new_state = c4.make_move(state, player, move)
                 # estimate of new state
-                val = self.net.predict(c4.get_neural_input(new_state).reshape(1, 1083), batch_size=1)
+                val = self.net.predict(c4.get_neural_input(new_state), batch_size=1)
                 if val > max_value:  # searching move with best estimate
                     max_value = val
                     next_move = move
@@ -83,7 +82,7 @@ class TD:
 
     def backup(self, value):  # updating TD values
         if self.previous_state is not None and self.learning:
-            self.net.fit(c4.get_neural_input(self.previous_state).reshape(1, 1083), value, batch_size=1,
+            self.net.fit(c4.get_neural_input(self.previous_state), value, batch_size=1,
                          nb_epoch=1)
 
     def save_network(self):
@@ -92,20 +91,20 @@ class TD:
         self.net.save_weights('network_weights.h5', overwrite=True)  # saving network weights
 
     def load_network(self):
-        print 'Loading network...'
+        print ('Loading network...')
         model = model_from_json(open('model.json').read())  # load model from file
         model.load_weights('network_weights.h5')  # load network weights
         model.compile(loss='mse', optimizer='rmsprop')
-        print 'Network loaded!'
+        print ('Network loaded!')
         self.net = model
 
 
 if __name__ == "__main__":
     player = TD()
-    # player.train(500000)
+    player.train(500000)
     winners = [0, 0, 0]
-    print "Testing"
+    print ('Testing')
     for i in xrange(10000):
-        print 'Test game: ' + str(i)
+        print ('Test game: ' + str(i))
         winners[c4.play_without_ui(player.greedy, c4.get_random_move)] += 1
     c4.plot_results(winners[1], winners[-1], winners[0], 'TD vs Random')
