@@ -3,6 +3,7 @@
 
 import math, pygame, sys, shutil, getpass
 from pygame.locals import *
+from fuzzy_agent import FuzzyAgent
 
 pygame.init()
 fpsClock = pygame.time.Clock()
@@ -68,7 +69,7 @@ class Ball:  # class for ball vars
         self.remaining = 3
         self.xPos = 1  # amount increasing by for x. adjusted for speed
         self.yPos = 1
-        self.adjusted = False  # says wether the xPos and yPos have been adjusted for speed
+        self.adjusted = False  # says whether the xPos and yPos have been adjusted for speed
         self.speed = 5
         self.collisions = 0
         self.alive = False
@@ -79,8 +80,8 @@ class Ball:  # class for ball vars
 
     def adjust(self):  # adjusts the x and y being added to the ball to make the hypotenuse the ball speed
         tSlope = math.sqrt(self.xPos ** 2 + self.yPos ** 2)
-        self.xPos = (self.speed / tSlope) * self.xPos
-        self.yPos = (self.speed / tSlope) * self.yPos
+        self.xPos *= (self.speed / tSlope)
+        self.yPos *= (self.speed / tSlope)
         self.adjusted = True
 
 
@@ -115,7 +116,7 @@ def write(x, y, color, msg):  # prints onto the screen in selected font
     screen.blit(msgSurfaceObj, msgRectobj)
 
 
-def game(score, paddle, ball, board, wall1):  # The game itself
+def game(score, paddle, ball, board, wall1, agent):  # The game itself
     # starting variables
     running = True
     ball.alive = True
@@ -136,19 +137,19 @@ def game(score, paddle, ball, board, wall1):  # The game itself
         pygame.draw.rect(screen, grey, wall1)
         pygame.draw.rect(screen, grey, wall2)
         pygame.draw.rect(screen, grey, wall3)
-        pygame.draw.rect(screen, red, (ball.x - 3, ball.y - 3, 6, 6))
+        pygame.draw.rect(screen, red, (ball.x - 3, ball.y - 3, 6, 6))  # drawing ball
         print_board(board, colors)
         print_paddle(paddle)
-        write(20, 20, grey, str(score))
+        write(20, 20, grey, str(score))  # score
         temp = 0
-        for life in range(ball.remaining):
+        for life in range(ball.remaining):  # drawing life rectangles on the right side
             if life != 0:
                 pygame.draw.rect(screen, red, (600, 400 - temp, 10, 10))
                 temp += 15
 
         # check all the collisions-------------------------
         if ball.moving:
-            if ball.adjusted == False:
+            if not ball.adjusted:
                 ball.adjust()
             ball.x += ball.xPos
             ball.y += ball.yPos
@@ -201,15 +202,7 @@ def game(score, paddle, ball, board, wall1):  # The game itself
             running = False
             ball.remaining -= 1
 
-        agent_move(ball, paddle)
-
-        # move paddle
-        if paddle.direction == 'right':
-            if paddle.x <= 561:
-                paddle.x += 8
-        elif paddle.direction == 'left':
-            if paddle.x >= 79:
-                paddle.x -= 8
+        agent_move(ball, paddle, agent)
 
         # get user input
         for event in pygame.event.get():
@@ -222,29 +215,13 @@ def game(score, paddle, ball, board, wall1):  # The game itself
                         ball.moving = True
         # update display
         pygame.display.update()
-        fpsClock.tick(90)
+        fpsClock.tick(120)
     return score
 
 
-def agent_move(ball, paddle):
-    if ball.yPos > 0:  # if ball goes down: calculate falling point
-        dist = (paddle.y - ball.y) / ball.yPos
-        fall_point = ball.x + dist * ball.xPos
-
-        if fall_point > 590:
-            fall_point = 590 - (fall_point % 590)
-        if fall_point < 50:
-            fall_point = math.fabs(50 - fall_point) + 50
-
-    else:  # if ball goes up: try to follow
-        fall_point = ball.x
-
-    if fall_point > paddle.x + 8:
-        paddle.direction = 'right'
-    elif fall_point < paddle.x - 8:
-        paddle.direction = 'left'
-    else:
-        paddle.direction = 'none'
+def agent_move(ball, paddle, agent):
+    distance = paddle.x - ball.x
+    paddle.x += 10 * agent.compute(distance)
 
 
 # -----------------------------------------------------
@@ -258,8 +235,9 @@ if __name__ == '__main__':
             score = 0
             paddle = Paddle()
             ball = Ball()
+            agent = FuzzyAgent()
             while ball.remaining > 0:
-                score = game(score, paddle, ball, board, wall1)
+                score = game(score, paddle, ball, board, wall1, agent)
                 if ball.remaining == 0:
                     for x in range(16):
                         for y in range(12):

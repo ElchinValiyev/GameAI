@@ -19,9 +19,9 @@ def plot_results(red_wins, black_wins, tie, title):
     plt.title(title)
     plt.tight_layout()
     plt.show()
-    print ("number of Player 1 wins ", red_wins)
-    print ("number of Player 2 wins ", black_wins)
-    print ("number of ties ", tie)
+    print "number of Player 1 wins ", red_wins
+    print "number of Player 2 wins ", black_wins
+    print "number of ties ", tie
 
 
 def make_move(board, player, column):
@@ -122,12 +122,15 @@ def play_without_ui(agent_1, agent_2):
 
 
 def get_neural_input(state):
-    return state.reshape(1, BOARD_HEIGHT * BOARD_WIDTH)
+    new_state = state.reshape(1, BOARD_HEIGHT * BOARD_WIDTH)
+    x = np.append((new_state == 0).astype(int), (new_state == 1).astype(int))
+    x = np.append(x, (new_state == -1).astype(int))
+    return x
 
 
 if __name__ == '__main__':
     winners = [0, 0, 0]
     for i in xrange(10000):
-        print ('Game: ' + str(i))
+        print 'Game: ' + str(i)
         winners[play_without_ui(get_random_move, get_random_move)] += 1
     plot_results(winners[1], winners[-1], winners[0], 'Random vs Random')
