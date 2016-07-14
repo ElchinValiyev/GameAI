@@ -11,6 +11,7 @@ class FuzzyAgent:
         distance = ctrl.Antecedent(np.arange(-440, 441, 1), 'distance')  # paddle.x - ball.x
         paddle_speed = ctrl.Consequent(np.arange(-16, 17, 1), 'speed')  # paddle.x +=paddle_speed
 
+
         # Auto-membership function population is possible with .automf(3, 5, or 7)
         # distance.automf(names=['far left', 'close left', 'above', 'close right', 'far right'])
         # paddle_speed.automf(3)
