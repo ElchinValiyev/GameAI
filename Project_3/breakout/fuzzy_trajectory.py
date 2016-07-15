@@ -8,7 +8,7 @@ class FuzzyTrajectory:
     def __init__(self):
         # Generate universe variables
 
-        distance = ctrl.Antecedent(np.arange(-9, 9, 1), 'distance')
+        distance = ctrl.Antecedent(np.arange(-8, 9, 1), 'distance')
         trajectory = ctrl.Consequent(np.arange(-2, 3, 1), 'trajectory')
 
         # Auto-membership function population is possible with .automf(3, 5, or 7)

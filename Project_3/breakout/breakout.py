@@ -11,6 +11,8 @@ fpsClock = pygame.time.Clock()
 screen = pygame.display.set_mode((640, 480))  # create screen - 640 pix by 480 pix
 pygame.display.set_caption('Breakout')  # set title bar
 icon = pygame.image.load('breakout.png')
+winner_image = pygame.image.load('/home/abbas/Desktop/winner.png')
+winner_rect = winner_image.get_rect()
 pygame.display.set_icon(icon)
 
 # add the font; use PressStart2P, but otherwise default if not available
@@ -107,7 +109,6 @@ def collide_paddle(paddle, ball):  # recalculates the trajectory for the ball af
         difference=float(ball.x) - float(paddle.x)
         trajectory=FuzzyTrajectory().compute(difference)
         ball.xPos = float(trajectory)
-        print "trajectory ",float(ball.xPos)
         ball.yPos = -1
     else:
         print "ball position ", ball.x, " paddle position ", ball.yPos
@@ -203,7 +204,8 @@ def game(score, paddle, ball, board, wall1, agent):  # The game itself
                     break
             if ball.y > 460:
                 ball.alive = False
-
+        if score == 432:
+            running = False
         # check if ball was lost
         if not ball.alive:
             running = False
@@ -245,6 +247,9 @@ if __name__ == '__main__':
             agent = FuzzyAgent()
             while ball.remaining > 0:
                 score = game(score, paddle, ball, board, wall1, agent)
+                if score == 432:
+                    replay = True
+                    break
                 if ball.remaining == 0:
                     for x in range(16):
                         for y in range(12):
@@ -260,7 +265,14 @@ if __name__ == '__main__':
                         ball = Ball()
                         board = new_board()
                         while ball.remaining > 0:
-                            score = game(score, paddle, ball, board, wall1)
+                            score = game(score, paddle, ball, board, wall1, agent)
+                            if score == 432:
+                                for x in range(16):
+                                    for y in range(12):
+                                        pygame.draw.rect(screen, black, (x * 40, y * 40, 40, 40))
+                                        pygame.display.update()
+                                        pygame.time.wait(10)
+
                             if ball.remaining == 0:
                                 for x in range(16):
                                     for y in range(12):
