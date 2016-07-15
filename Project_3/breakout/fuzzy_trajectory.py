@@ -8,36 +8,36 @@ class FuzzyTrajectory:
     def __init__(self):
         # Generate universe variables
 
-        quality = ctrl.Antecedent(np.arange(-8, 9, 1), 'quality')
-        tip = ctrl.Consequent(np.arange(-2, 3, 1), 'tip')
+        distance = ctrl.Antecedent(np.arange(-9, 9, 1), 'distance')
+        trajectory = ctrl.Consequent(np.arange(-2, 3, 1), 'trajectory')
 
         # Auto-membership function population is possible with .automf(3, 5, or 7)
-        quality.automf(3)
+        distance.automf(3)
 
         # Custom membership functions can be built interactively with a familiar,
         # Pythonic API
-        tip['low'] = fuzz.trimf(tip.universe, [-2, -2, -2])
-        tip['medium'] = fuzz.trimf(tip.universe, [0, 0, 2])
-        tip['high'] = fuzz.trimf(tip.universe, [0, 2, 2])
+        trajectory['low'] = fuzz.trimf(trajectory.universe, [-2, -2, -2])
+        trajectory['medium'] = fuzz.trimf(trajectory.universe, [0, 0, 2])
+        trajectory['high'] = fuzz.trimf(trajectory.universe, [0, 2, 2])
 
-        rule1 = ctrl.Rule(quality['poor'], tip['low'])
-        rule2 = ctrl.Rule(quality['average'], tip['medium'])
-        rule3 = ctrl.Rule(quality['good'], tip['high'])
+        rule1 = ctrl.Rule(distance['poor'], trajectory['low'])
+        rule2 = ctrl.Rule(distance['average'], trajectory['medium'])
+        rule3 = ctrl.Rule(distance['good'], trajectory['high'])
 
         # Pass inputs to the ControlSystem using Antecedent labels with Pythonic API
         # Note: if you like passing many inputs all at once, use .inputs(dict_of_data)
-        tipping_ctrl = ctrl.ControlSystem([rule1, rule2, rule3])
-        self.agent = ctrl.ControlSystemSimulation(tipping_ctrl)
+        trajectoryping_ctrl = ctrl.ControlSystem([rule1, rule2, rule3])
+        self.agent = ctrl.ControlSystemSimulation(trajectoryping_ctrl)
 
     def compute(self, distance):
         # Pass inputs to the ControlSystem using Antecedent labels with Pythonic API
         # Note: if you like passing many inputs all at once, use .inputs(dict_of_data)
-        self.agent.input['quality'] = distance
+        self.agent.input['distance'] = distance
         # Crunch the numbers
         self.agent.compute()
-        return self.agent.output['tip']
+        return self.agent.output['trajectory']
 
 
 if __name__ == '__main__':
-    agent = FuzzyAgent()
+    agent = FuzzyTrajectory()
     print agent.compute(-7)
