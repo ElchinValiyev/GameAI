@@ -4,11 +4,14 @@
 import math, pygame, sys, shutil, getpass
 from pygame.locals import *
 from fuzzy_agent import FuzzyAgent
+from fuzzy_trajectory import FuzzyTrajectory
 
 pygame.init()
 fpsClock = pygame.time.Clock()
 screen = pygame.display.set_mode((640, 480))  # create screen - 640 pix by 480 pix
 pygame.display.set_caption('Breakout')  # set title bar
+icon = pygame.image.load('breakout.png')
+pygame.display.set_icon(icon)
 
 # add the font; use PressStart2P, but otherwise default if not available
 try:
@@ -101,9 +104,13 @@ def print_paddle(paddle):  # prints the paddle
 def collide_paddle(paddle, ball):  # recalculates the trajectory for the ball after collision with the paddle
     ball.adjusted = False
     if ball.x - paddle.x != 0:
-        ball.xPos = (ball.x - paddle.x) / 8
+        difference=float(ball.x) - float(paddle.x)
+        trajectory=FuzzyTrajectory().compute(difference)
+        ball.xPos = float(trajectory)
+        print "trajectory ",float(ball.xPos)
         ball.yPos = -1
     else:
+        print "ball position ", ball.x, " paddle position ", ball.yPos
         ball.xPos = 0
         ball.yPos = 1
     return ball.adjusted, float(ball.xPos), float(ball.yPos)
@@ -159,7 +166,7 @@ def game(score, paddle, ball, board, wall1, agent):  # The game itself
                     ball.collisions += 1
                     # increase ball speeds at 4 hits on paddle, 12 hits, orange row, red row
                     if ball.collisions % 4 == 0:
-                        ball.speed += 1
+                        ball.speed += 0.24
 
             # check wall collide----------------------------
             if wall1.colliderect(ball.rect()) or wall2.colliderect(ball.rect()):
@@ -182,12 +189,12 @@ def game(score, paddle, ball, board, wall1, agent):  # The game itself
                                 score += 4
                                 if colO == False:
                                     colO = True
-                                    ball.speed += 1
+                                    ball.speed += 0.25
                             else:
                                 score += 7
                                 if colR == False:
                                     colR = True
-                                    ball.speed += 2
+                                    ball.speed += 0.5
                             Break = True
                             # ball.speed += 1
                     if Break:
@@ -221,7 +228,7 @@ def game(score, paddle, ball, board, wall1, agent):  # The game itself
 
 def agent_move(ball, paddle, agent):
     distance = paddle.x - ball.x
-    paddle.x += 10 * agent.compute(distance)
+    paddle.x += agent.compute(distance)
 
 
 # -----------------------------------------------------
