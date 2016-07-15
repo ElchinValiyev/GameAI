@@ -22,7 +22,6 @@ def e_step(centers, datapoints):
 def m_step(clusters, datapoints, centers):
     sum = np.zeros(centers.shape)
     counters = np.bincount(clusters)
-    print counters
     for j in range(len(centers)):
         for i in range(len(clusters)):
             if (clusters[i] == j):
@@ -34,10 +33,9 @@ def m_step(clusters, datapoints, centers):
 def kmeans(k, datapoints):
     centers = np.array(random.sample(datapoints, k))
     clusters = np.zeros((len(datapoints)))
-    print centers
     assert len(centers) == k
     old_centers = np.zeros(np.shape(centers))
-    while ((old_centers != centers).all()):
+    while not((old_centers == centers).all()):
         old_centers = centers
         clusters = e_step(centers, datapoints)
         centers = m_step(clusters, datapoints, centers)
