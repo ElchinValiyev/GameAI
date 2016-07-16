@@ -11,8 +11,6 @@ fpsClock = pygame.time.Clock()
 screen = pygame.display.set_mode((640, 480))  # create screen - 640 pix by 480 pix
 pygame.display.set_caption('Breakout')  # set title bar
 icon = pygame.image.load('breakout.png')
-winner_image = pygame.image.load('/home/abbas/Desktop/winner.png')
-winner_rect = winner_image.get_rect()
 pygame.display.set_icon(icon)
 
 # add the font; use PressStart2P, but otherwise default if not available

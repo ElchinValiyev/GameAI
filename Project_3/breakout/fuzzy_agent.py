@@ -13,25 +13,13 @@ class FuzzyAgent:
 
 
         # Auto-membership function population is possible with .automf(3, 5, or 7)
-        # distance.automf(names=['far left', 'close left', 'above', 'close right', 'far right'])
-        # paddle_speed.automf(3)
-
         # Generate fuzzy membership functions
         distance['far right'] = fuzz.trimf(distance.universe, [-440, -250, -110])
         distance['close right'] = fuzz.trimf(distance.universe, [-200, -10, 0])
         distance['close left'] = fuzz.trimf(distance.universe, [0, 10, 200])
         distance['far left'] = fuzz.trimf(distance.universe, [200, 440, 440])
 
-        # paddle_speed['fast left'] = fuzz.trimf(paddle_speed.universe, [-16, -16, -4])
-        # paddle_speed['slow left'] = fuzz.trimf(paddle_speed.universe, [-8, -4, 0])
-        # paddle_speed['slow right'] = fuzz.trimf(paddle_speed.universe, [0, 4, 8])
-        # paddle_speed['fast right'] = fuzz.trimf(paddle_speed.universe, [4, 16, 16])
         paddle_speed.automf(7)
-        # Visualize these universes and membership functions
-        # distance.view()
-        # paddle_speed.view()
-        # plt.show()
-
         rule1 = ctrl.Rule(distance['far left'], paddle_speed['dismal'])
         rule2 = ctrl.Rule(distance['close left'], paddle_speed['dismal'])
         rule3 = ctrl.Rule(distance['close right'], paddle_speed['excellent'])
