@@ -3,6 +3,7 @@ import helper as hp
 import numpy as np
 
 
+# learns SOM created in 3rd task of the project
 def learn_som(input_file, centers_number, iterations_number):
     som1 = SOM(centers_number)
     points = hp.read_points(input_file)
